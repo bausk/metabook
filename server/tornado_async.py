@@ -12,10 +12,14 @@ class VersionHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
 
 class GetGameByIdHandler(tornado.web.RequestHandler):
+    def initialize(self, common_string):
+        self.common_string = common_string
     def get(self, *id):
         response = { 'id': int(id[0]),
                      'name': 'Crazy Game',
-                     'release_date': date.today().isoformat() }
+                     'release_date': date.today().isoformat(),
+                     'common_string': self.common_string
+                     }
         self.write(response)
 
 class GetFullPageAsyncHandler(tornado.web.RequestHandler):
@@ -28,10 +32,20 @@ class GetFullPageAsyncHandler(tornado.web.RequestHandler):
         self.write(response)
         self.set_header("Content-Type", "text/html")
 
+class ErrorHandler(tornado.web.RequestHandler):
+    def get(self, error_code):
+        if error_code == 1:
+            self.set_status(500)
+        elif error_code == 2:
+            self.send_error(500)
+        else:
+            raise tornado.web.HTTPError(500)
+
 application = tornado.web.Application([
-    ("/getgamebyid/([0-9]+)/*", GetGameByIdHandler),
+    ("/getgamebyid/([0-9]+)/*", GetGameByIdHandler, dict(common_string='Value defined in Application')),
     ("/version", VersionHandler),
     ("/getfullpage/*", GetFullPageAsyncHandler),
+    (r"/error/([0-9]+)", ErrorHandler),
     ])
 
 if __name__ == "__main__":
