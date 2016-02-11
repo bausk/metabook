@@ -26,11 +26,11 @@ class AuthMixin(object):
     #     return user_type
 
 
-class APIHandler(AuthMixin, requesthandlers.APIHandler):
+class APIHandler(requesthandlers.APIHandler):
     """APIHandler"""
     # For PyCharm completion, since this is otherwise dynamically  inserted
     body = None
 
 
-class ViewHandler(AuthMixin, requesthandlers.ViewHandler):
+class ViewHandler(requesthandlers.ViewHandler):
     """ViewHandler"""
