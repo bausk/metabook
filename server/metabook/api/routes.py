@@ -9,10 +9,15 @@ from urllib import parse
 
 class MainHandler(tornado.web.RequestHandler):
 
+    def initialize(self, init):
+        # http://www.tornadoweb.org/en/stable/web.html#entry-points
+        self.foo = "Bar " + str(init)
+        pass
+
     @tornado.gen.coroutine
     @tornado.web.addslash
     def get(self, arg1):
-        self.render("index.html", path=options.path, arg1=arg1)
+        self.render("index.html", path=options.path, arg1=arg1, foo=self.foo)
 
 
 class GraphHandler(tornado.web.RequestHandler):

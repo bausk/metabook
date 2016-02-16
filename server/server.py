@@ -32,7 +32,7 @@ class Application(tornado.web.Application):
 
     def __init__(self):
         handlers = [
-            (r"/tree(/.*)?", metabook.api.routes.MainHandler),
+            (r"/tree(/.*)?", metabook.api.routes.MainHandler, dict(init=0)),
             (r"/graph/(.*)", metabook.api.routes.GraphHandler),
             (r"/api/session/(.*)", metabook.api.sessions.SessionHandler)
 
