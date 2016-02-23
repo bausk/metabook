@@ -1,0 +1,99 @@
+{% from metabook.config import metabook_config %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% block head %}
+    <meta charset="utf-8">
+    <title>{{lpath}} - Metabook</title>
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="/static/css/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/static/ink/css/ink-flex.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css" />
+
+
+
+
+    <style type="text/css">
+
+        body {
+            background: #ededed;
+        }
+
+        header h1 small:before  {
+            content: "|";
+            margin: 0 0.5em;
+            font-size: 1.6em;
+        }
+
+        footer {
+            background: #ccc;
+        }
+    </style>
+
+
+    <!-- load Ink's javascript files -->
+    <script type="text/javascript" src="/static/ink/js/holder.js"></script>
+    <script type="text/javascript" src="/static/ink/js/ink-all.min.js"></script>
+    <script type="text/javascript" src="/static/ink/js/autoload.js"></script>
+
+    {% end %}
+
+    {% block customhead %}
+
+
+    {% end %}
+
+</head>
+
+
+    <body>
+
+        <div class="ink-grid">
+
+
+{% block header %}
+
+            <header class="vertical-space">
+
+                {% block header_title %}
+                <h1>Metabook<small>{{lpath}}</small></h1>
+                {% end %}
+
+                <nav class="ink-navigation">
+                    <ul class="menu horizontal black">
+
+                        {% block header_nav %}
+                        <li class="active"><a href="#">Tree</a></li>
+                        <li><a href="#">New Graph</a></li>
+                        <li><a href="#">Manage Graphs</a></li>
+                        {% end %}
+
+                    </ul>
+                </nav>
+            </header>
+
+{% end %}
+
+{% block content %}
+
+            <div class="column-group gutters">
+                <div class="all-100">
+
+                </div>
+            </div>
+
+{% end %}
+
+        </div>
+
+{% block footer %}
+
+{% end %}
+
+    </body>
+</html>
