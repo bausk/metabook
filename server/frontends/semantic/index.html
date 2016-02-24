@@ -1,6 +1,61 @@
-{% extends "base.html" %}
+{% extends "base_semantic.html" %}
 
-{% block content %}
+
+{% block header_nav_semantic %}
+<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Home</a></div>
+<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span> To folder</a></div>
+<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Manage graphs</a></div>
+{% end %}
+
+{% block header_title %}
+<div class="item"><h3>{{lpath}}</h3></div>
+{% end %}
+
+
+{% block body_content_semantic %}
+
+<div class="ui container">
+<table class="ui selectable table">
+    <thead>
+    <tr>
+        <th class="align-left">{{lpath}}</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr>
+       <td onclick="window.location='{{root}}{{rbase}}'"><span class="fa fa-home"></span> Home </td>
+    </tr>
+    <tr>
+       <td onclick="window.location='{{root}}{{rbase}}{{level_up_path}}'"><span class="fa fa-folder-open-o"></span> ..</td>
+    </tr>
+
+    {% for dirname in dirlist %}
+
+    <tr>
+       <td onclick="window.location='{{root}}{{rbase}}{{uri}}/{{dirname}}'"><span class="fa fa-folder-open"></span> {{dirname}}</td>
+    </tr>
+
+    {% end %}
+
+    {% for filename in filelist %}
+
+    <tr>
+       <td onclick="window.location='{{root}}/{{metabook_config.routes.file}}{{uri}}/{{filename}}'"><span class="fa fa-file-code-o"></span> {{filename}}</td>
+    </tr>
+
+    {% end %}
+
+    </tbody>
+</table>
+</div>
+
+
+{% end %}
+
+
+
+{% block body_content %}
 
 <table class="ink-table bordered hover">
     <thead>
