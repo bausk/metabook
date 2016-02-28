@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block head_scripts %}
+
+<link rel="stylesheet" type="text/css" href="/static/semantic/semantic.css" />
+
+<style type="text/css">
+
+    body {
+        background: #ededed;
+    }
+
+    header h1 small:before  {
+        content: "|";
+        margin: 0 0.5em;
+        font-size: 1.6em;
+    }
+
+    footer {
+        background: #ccc;
+    }
+</style>
+
+
+<link rel="stylesheet" type="text/css" href="/static/css/metabook.css" />
+
+<link rel="stylesheet" type="text/css" href="/static/css/joint.css" />
+
+<script src="/static/joint/jquery.js"></script>
+<script src="/static/joint/lodash.min.js"></script>
+<script src="/static/joint/backbone.js"></script>
+<script src="/static/joint/joint.js"></script>
+<script src="/static/semantic/semantic.js"></script>
+{% end %}
+
+
+{% block head_custom %}
+{% end %}
+
+{% block body %}
+<body>
+
+
+    {% block body_header %}
+        <div class="ui top inverted menu">
+
+            {% block header_nav_semantic %}
+            {% end %}
+
+            {% block header_title %}
+            {% end %}
+
+        </div>
+    {% end %}
+
+    {% block body_menu %}
+
+    {% end %}
+
+    {% block body_content_semantic %}
+
+    {% end %}
+
+    {% block body_footer %}
+
+    {% end %}
+
+</body>
+{% end %}

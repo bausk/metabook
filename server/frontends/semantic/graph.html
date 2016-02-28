@@ -1,25 +1,12 @@
-{% extends "base_semantic.html" %}
+{% extends "base_graph.html" %}
 
 {% block head_custom %}
-<link rel="stylesheet" type="text/css" href="/static/css/joint.css" />
 
-<script src="/static/joint/jquery.js"></script>
-<script src="/static/joint/lodash.min.js"></script>
-<script src="/static/joint/backbone.js"></script>
-<script src="/static/joint/joint.js"></script>
 
 <script src="/static/js/graph_jointjs.js"></script>
 <script src="/static/js/graph.js"></script>
+
 {% end %}
-
-
-
-{% block header_nav %}
-<li><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Home</a></li>
-<li><a href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span> To Folder</a></li>
-<li><a href="#">Manage Graphs</a></li>
-{% end %}
-
 
 {% block header_nav_semantic %}
 <div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Home</a></div>
@@ -31,14 +18,10 @@
 <div class="item"><h3>{{lpath}}</h3></div>
 {% end %}
 
-{% block body_menu %}
-
-{% end %}
-
 {% block body_content_semantic %}
 <div class="ui two column relaxed padded grid">
 
-    <div class="ui two wide column">
+    <div class="ui two wide column" id="uiLeftTable">
         <table class="ui celled table">
         <tbody>
         <tr>
@@ -51,61 +34,23 @@
         <button class="ui button" id="bConnect">
         Connect to kernel
         </button>
-        <button class="ui button">
-        Send changes
+        <button class="ui disabled button" id="bSend">
+        Send data
         </button>
-        <button class="ui button">
-        Sync
+        <button class="ui button" id="bTest1">
+        Test Scope
         </button>
-        <button class="ui button">
-        Connect to kernel
+        <button class="ui disabled button" id="bClose">
+        Close connection
         </button>
         </div>
 
-        <div id="messages" class="ui info message" style="height:200px;"></div>
+        <div id="messages" class="ui info message"></div>
     </div>
 
     <div class="ui four wide column">
         <div id="myholder"></div>
     </div>
 </div>
-
-
-
-{% end %}
-
-{% block body_content_ink %}
-  <div class="column-group horizontal-gutters">
-    <div class="all-30">
-        <table class="ink-table bordered hover">
-            <tbody>
-            <tr>
-               <td onclick="window.location='#'"><span class="fa fa-code-fork"></span> {{data}}</td>
-            </tr>
-            </tbody>
-        </table>
-        <br>
-
-        <button class="ui button" id="bConnect" style="margin: 3px; width: 150px">
-            Connect to kernel
-        </button><br>
-        <button class="ui button" style="margin: 3px; width: 150px">
-            Send changes
-        </button><br>
-        <button class="ui button" style="margin: 3px; width: 150px">
-            Sync
-        </button><br>
-        <button class="ui button" style="margin: 3px; width: 150px">
-            Connect to kernel
-        </button><br>
-
-        <div id="messages" class="ui info message" style="height:200px;"></div>
-
-    </div>
-
-    <div class="all-70">
-          <div id="myholder" style="height: 300px; border: 1px #d0c7b7 solid; background: #e0dacf;"></div>
-    </div>
-  </div>
 
 {% end %}

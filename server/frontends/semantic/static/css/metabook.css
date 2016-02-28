@@ -168,3 +168,8 @@
 {
   cursor: pointer;
 }
+
+#uiLeftTable
+{
+  min-width: 200px;
+}

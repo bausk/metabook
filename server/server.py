@@ -15,7 +15,7 @@ import tornado.web
 import tornado.websocket
 import os
 import os.path
-import sys
+import socket
 import uuid
 import metabook.api.routes
 import metabook.api.sessions
@@ -52,9 +52,13 @@ class Application(tornado.web.Application):
 def main():
     tornado.options.parse_command_line()
     app = Application()
+
     app.listen(options.port)
+    myip = socket.gethostbyname(socket.gethostname())
+    print("Metabook server started at %s" % myip)
     tornado.ioloop.IOLoop.current().start()
-    print("Server started at ")
+
+
     logging.info("Exit...")
 
 
