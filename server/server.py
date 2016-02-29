@@ -36,6 +36,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/" + metabook_config.routes.tree + r"(/.*)?", metabook.api.routes.MainHandler, dict(init=0)),
             (r"/" + metabook_config.routes.file + r"/(.*)", metabook.api.routes.GraphHandler),
+            (r"/" + metabook_config.routes.file + r"/\?new", metabook.api.routes.GraphHandler),
             (r"/" + metabook_config.routes.session + r"/(.*)", metabook.api.sessions.SessionHandler)
 
         ]

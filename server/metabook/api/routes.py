@@ -52,11 +52,16 @@ class GraphHandler(tornado.web.RequestHandler):
         request_path = uri.rstrip('/') if uri else ''
         remote_root = "{}://{}".format(self.request.protocol, self.request.host)
         level_up_path = request_path[:request_path.rfind("/")] if request_path.rfind("/") != (-1) else ""
-        try:
-            with open(local_path) as data_file:
-                data = json.load(data_file)
 
-            self.render("graph.html", lpath=local_path, root=remote_root, uri=request_path,
-                        level_up_path=level_up_path, data=data)
-        except EnvironmentError:
-            raise tornado.web.HTTPError(404)
+        def graph_json():
+            if 'new' in self.request.arguments:
+                return ""
+            try:
+                with open(local_path) as data_file:
+                    data = json.load(data_file)
+            except EnvironmentError:
+                raise tornado.web.HTTPError(404)
+            return data
+
+        self.render("graph.html", lpath=local_path, root=remote_root, uri=request_path,
+                        level_up_path=level_up_path, data=graph_json())

@@ -3,8 +3,8 @@
 
 {% block header_nav_semantic %}
 <div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Home</a></div>
-<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span> To folder</a></div>
-<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Manage graphs</a></div>
+<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span> Manage server</a></div>
+<div class="item"><a href="{{root}}/{{metabook_config.routes.file}}{{uri}}/?new" class="ui blue button"><span class="fa fa-edit"></span> New graph</a></div>
 {% end %}
 
 {% block header_title %}
