@@ -1,10 +1,9 @@
-window.onload = ->
-    graph = new joint.dia.Graph
-
+init_jointjs = (obj) ->
+    graph = new joint.dia.Graph()
     paper = new joint.dia.Paper({
         el: $('#myholder'),
         width: 600,
-        height: 200,
+        height: 600,
         model: graph,
         gridSize: 1
     })

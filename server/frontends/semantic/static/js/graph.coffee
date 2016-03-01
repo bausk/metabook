@@ -3,6 +3,8 @@ $(document).ready ->
 
     messageContainer = $("#messages")
 
+
+
     WebSocketTest = (ev) ->
         messageContainer.text("WebSocket is supported by your Browser!")
         ws = new WebSocket("ws://" + window.location.host + "/api/session/guise?Id=123456789")
@@ -44,8 +46,11 @@ $(document).ready ->
         alert(counter.getCount())
     )
 
-    $.get(metabook.file_api_endpoint + metabook.path, (result) ->
-        $("#el_file_contents").text(result)
-    )
+    $.get(metabook.file_api_endpoint + metabook.path, init_graph)
+
+init_graph = (graph_json) ->
+    $("#el_file_contents").text(graph_json)
+    source_obj = JSON.parse(graph_json)
+    init_jointjs(source_obj)
 
 
