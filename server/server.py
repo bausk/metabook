@@ -8,18 +8,21 @@
 # http://www.tornadoweb.org/en/stable/webframework.html
 
 import logging
+import os
+import os.path
+import socket
+
 import tornado.escape
 import tornado.ioloop
 import tornado.options
 import tornado.web
 import tornado.websocket
-import os
-import os.path
-import socket
-import uuid
-import metabook.api.routes
+
 import metabook.api.sessions
+import metabook.api.file
+import metabook.routes
 from metabook.config import metabook_config
+
 # from tornado_json.routes import get_routes
 
 
@@ -34,10 +37,11 @@ define("static", default=metabook_config.static, help="static directory", type=s
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/" + metabook_config.routes.tree + r"(/.*)?", metabook.api.routes.MainHandler, dict(init=0)),
-            (r"/" + metabook_config.routes.file + r"/(.*)", metabook.api.routes.GraphHandler),
-            (r"/" + metabook_config.routes.file + r"/\?new", metabook.api.routes.GraphHandler),
-            (r"/" + metabook_config.routes.session + r"/(.*)", metabook.api.sessions.SessionHandler)
+            (r"/" + metabook_config.routes.tree + r"(/.*)?", metabook.routes.MainHandler, dict(init=0)),
+            (r"/" + metabook_config.routes.graph + r"/(.*)", metabook.routes.GraphHandler),
+            (r"/" + metabook_config.routes.graph + r"/\?new", metabook.routes.GraphHandler),
+            (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.file.FileHandler),
+            (r"/" + metabook_config.routes.api.session + r"/(.*)", metabook.api.sessions.SessionHandler)
 
         ]
         settings = dict(

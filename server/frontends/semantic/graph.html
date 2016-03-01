@@ -5,7 +5,14 @@
 
 <script src="/static/js/graph_jointjs.js"></script>
 <script src="/static/js/graph.js"></script>
-
+<script language="JavaScript">
+    var metabook = {
+        root: "{{root}}",
+        file_api_endpoint: "{{root}}/{{metabook_config.routes.api.file}}/",
+        file_id: "{% if 'new' in request.arguments %}{% else %}0123456789{% end %}",
+        path: "{{uri}}"
+    }
+</script>
 {% end %}
 
 {% block header_nav_semantic %}
@@ -25,8 +32,12 @@
         <table class="ui celled table">
         <tbody>
         <tr>
-           <td onclick="window.location='#'"><span class="fa fa-code-fork"></span> {{data}}</td>
+           <td><span class="fa fa-code-fork"></span> {{data}}</td>
         </tr>
+        <tr>
+           <td><span class="fa fa-code-fork"></span> <div class="ui label" id="el_file_contents"></div></td>
+        </tr>
+
         </tbody>
         </table>
 

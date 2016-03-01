@@ -27,10 +27,7 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         self.clients[self.id] = {"id": self.id, "object": self}
 
     def on_message(self, message):
-        """
-        when we receive some message we want some message handler..
-        for this example i will just print message to console
-        """
+
         self.count += 1
         new_guid = uuid.uuid4()
         print("Client %s received a message : %s" % (self.id, message))

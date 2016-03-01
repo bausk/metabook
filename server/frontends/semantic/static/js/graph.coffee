@@ -1,12 +1,7 @@
 $(document).ready ->
-    WebSocketTest    = undefined
+    WebSocketTest = undefined
 
     messageContainer = $("#messages")
-
-    datastore = Backbone.Model.extend({
-        websocket: null
-
-    })
 
     WebSocketTest = (ev) ->
         messageContainer.text("WebSocket is supported by your Browser!")
@@ -30,7 +25,7 @@ $(document).ready ->
             received_msg = evt.data
             $(messageContainer).text("Message is received..." + received_msg)
         ws.onclose = ->
-            #$(messageContainer).text("Connection is closed...")
+            $(messageContainer).text("Connection is closed...")
 
 
     $('#bConnect').on("click", WebSocketTest)
@@ -47,6 +42,10 @@ $(document).ready ->
     $('#bTest1').on("click", ->
         counter.increment()
         alert(counter.getCount())
+    )
+
+    $.get(metabook.file_api_endpoint + metabook.path, (result) ->
+        $("#el_file_contents").text(result)
     )
 
 
