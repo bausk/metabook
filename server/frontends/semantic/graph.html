@@ -17,6 +17,7 @@
 {% end %}
 
 {% block header_nav_semantic %}
+<div class="item" id="uiMenuToggle"><a><span class="fa fa-list"></span> Menu</a></div>
 <div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Home</a></div>
 <div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span> To folder</a></div>
 <div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span> Manage server</a></div>
@@ -26,10 +27,27 @@
 <div class="item"><h3>{{lpath}}</h3></div>
 {% end %}
 
-{% block body_content_semantic %}
-<div class="ui two column relaxed padded grid">
 
-    <div class="ui two wide column" id="uiLeftTable">
+
+{% block body_content_semantic %}
+
+
+
+
+<div class="ui two column relaxed padded grid pushable" id="uiMainContent">
+    <div class="ui sidebar inverted vertical menu" id="uiLeftSidebar">
+    <a class="item">
+      1
+    </a>
+    <a class="item">
+      2
+    </a>
+    <a class="item">
+      3
+    </a>
+    </div>
+
+    <div class="ui two wide column pusher" id="uiLeftTable">
         <table class="ui celled table">
         <tbody>
         <tr>
@@ -60,9 +78,10 @@
         <div id="messages" class="ui info message"></div>
     </div>
 
-    <div class="ui four wide column">
+    <div id="paper_holder" class="ui twelve wide column">
         <div id="myholder"></div>
     </div>
 </div>
+
 
 {% end %}

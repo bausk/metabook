@@ -2,14 +2,18 @@
 var init_jointjs;
 
 init_jointjs = function(obj) {
-  var graph, link, paper, rect, rect2;
+  var graph, link, paper, paper_holder, paperscale, rect, rect2;
+  paper_holder = $('#paper_holder');
   graph = new joint.dia.Graph();
   paper = new joint.dia.Paper({
     el: $('#myholder'),
-    width: 600,
-    height: 600,
+    width: paper_holder.width(),
+    height: paper_holder.height(),
     model: graph,
     gridSize: 1
+  });
+  $(window).resize(function() {
+    return paper.setDimensions(paper_holder.width(), paper_holder.height());
   });
   rect = new joint.shapes.basic.Rect({
     position: {
@@ -40,7 +44,17 @@ init_jointjs = function(obj) {
       id: rect2.id
     }
   });
-  return graph.addCells([rect, rect2, link]);
+  graph.addCells([rect, rect2, link]);
+  paperscale = 1;
+  return $('#myholder').on("mousewheel", function(ev) {
+    if (ev.originalEvent.deltaY < 0) {
+      paperscale += 0.1;
+      return paper.scale(paperscale, paperscale);
+    } else {
+      paperscale -= 0.1;
+      return paper.scale(paperscale, paperscale);
+    }
+  });
 };
 
 //# sourceMappingURL=graph_jointjs.js.map

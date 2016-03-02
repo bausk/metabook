@@ -51,7 +51,13 @@ $(document).ready(function() {
     counter.increment();
     return alert(counter.getCount());
   });
-  return $.get(metabook.file_api_endpoint + metabook.path, init_graph);
+  $.get(metabook.file_api_endpoint + metabook.path, init_graph);
+  $("#uiLeftSidebar").sidebar('setting', 'transition', 'overlay');
+  $("#uiLeftSidebar").sidebar('setting', 'dimPage', false);
+  $("#uiLeftSidebar").sidebar({
+    context: $('#uiLeftTable')
+  });
+  return $("#uiLeftSidebar").sidebar('attach events', '#uiMenuToggle');
 });
 
 init_graph = function(graph_json) {
