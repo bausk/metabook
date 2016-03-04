@@ -59,16 +59,31 @@ init_jointjs = (obj) ->
         $('#messages').text([V(paper.viewport).toLocalPoint(0,0).x, V(paper.viewport).toLocalPoint(0,0).y, p.x, p.y].join(", "))
         if newScale > 0.1 && newScale < 10
 
-            paper.setOrigin(0, 0)
-            paper.scale(newScale, newScale, coord1, coord2)
-
+            paper.scale(newScale, newScale)
+            paper.setOrigin(coord1 - newScale * p.x, coord2 - newScale * p.y)
     )
 
-    paperscroller = new joint.ui.PaperScroller({
-        paper: paper
-    })
+    panAndZoom = svgPanZoom(
+        $('#myholder'),
+        {
+            viewportSelector: $('#v-2'),
+            fit: false,
+            zoomScaleSensitivity: 0.4,
+            panEnabled: false,
+        }
+    )
 
-    paper.on('blank:pointerdown', paperscroller.startPanning);
+    #Enable pan when a blank area is click (held) on
+    paper.on('blank:pointerdown', (evt, x, y) ->
+        panAndZoom.enablePan()
+    )
+
+
+
+    #//Disable pan when the mouse button is released
+    paper.on('cell:pointerup blank:pointerup', (cellView, event) ->
+        panAndZoom.disablePan()
+    )
 
 
 

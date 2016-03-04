@@ -57,7 +57,7 @@ $(document).ready(function() {
 init_graph = function(graph_json) {
   var source_obj;
   $("#el_file_contents").text(graph_json);
-  source_obj = JSON.parse(graph_json);
+  source_obj = graph_json;
   init_jointjs(source_obj);
   $("#uiLeftSidebar").sidebar({
     context: $('#id2')

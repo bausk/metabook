@@ -4,7 +4,7 @@ var init_jointjs, paper;
 paper = void 0;
 
 init_jointjs = function(obj) {
-  var graph, link, offsetToLocalPoint, origin, paper_holder, paperscale, paperscroller, rect, rect2;
+  var graph, link, offsetToLocalPoint, origin, panAndZoom, paper_holder, paperscale, rect, rect2;
   paper_holder = $('#paper_holder');
   graph = new joint.dia.Graph();
   paper = new joint.dia.Paper({
@@ -71,14 +71,22 @@ init_jointjs = function(obj) {
     }
     $('#messages').text([V(paper.viewport).toLocalPoint(0, 0).x, V(paper.viewport).toLocalPoint(0, 0).y, p.x, p.y].join(", "));
     if (newScale > 0.1 && newScale < 10) {
-      paper.setOrigin(0, 0);
-      return paper.scale(newScale, newScale, coord1, coord2);
+      paper.scale(newScale, newScale);
+      return paper.setOrigin(coord1 - newScale * p.x, coord2 - newScale * p.y);
     }
   });
-  paperscroller = new joint.ui.PaperScroller({
-    paper: paper
+  panAndZoom = svgPanZoom($('#myholder'), {
+    viewportSelector: $('#v-2'),
+    fit: false,
+    zoomScaleSensitivity: 0.4,
+    panEnabled: false
   });
-  return paper.on('blank:pointerdown', paperscroller.startPanning);
+  paper.on('blank:pointerdown', function(evt, x, y) {
+    return panAndZoom.enablePan();
+  });
+  return paper.on('cell:pointerup blank:pointerup', function(cellView, event) {
+    return panAndZoom.disablePan();
+  });
 };
 
 //# sourceMappingURL=graph_jointjs.js.map
