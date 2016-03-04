@@ -1,53 +1,19 @@
 {% extends "base_graph.html" %}
 
-{% block head_custom %}
+{% block body %}
+<body style="overflow: hidden">
 
-<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
-
-<script src="/static/js/graph_jointjs.js"></script>
-<script src="/static/js/graph.js"></script>
-<script language="JavaScript">
-    var metabook = {
-        root: "{{root}}",
-        file_api_endpoint: "{{root}}/{{metabook_config.routes.api.file}}/",
-        file_id: "{% if 'new' in request.arguments %}{% else %}0123456789{% end %}",
-        path: "{{uri}}"
-    }
-</script>
-{% end %}
-
-{% block header_nav_semantic %}
-<div class="item" id="uiMenuToggle"><a><span class="fa fa-list"></span> Menu</a></div>
-<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span> Home</a></div>
-<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span> To folder</a></div>
-<div class="item"><a href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span> Manage server</a></div>
-{% end %}
-
-{% block header_title %}
-<div class="item"><h3>{{lpath}}</h3></div>
-{% end %}
-
-
-
-{% block body_content_semantic %}
-
-
-
-
-<div class="ui two column relaxed padded grid pushable" id="uiMainContent">
-    <div class="ui sidebar inverted vertical menu" id="uiLeftSidebar">
-    <a class="item">
-      1
-    </a>
-    <a class="item">
-      2
-    </a>
-    <a class="item">
-      3
-    </a>
+    <div class="ui top inverted menu">
+        <a class="item" id="uiMenuToggle"><i class="fa fa-list"></i>&nbsp;Menu</a>
+        <a class="item" href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span>&nbsp;Home</a>
+        <a class="item" href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span>&nbsp;To folder</a>
+        <a class="item" href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span>&nbsp;Manage server</a>
+        <div class="item"><h3>{{lpath}}</h3></div>
     </div>
 
-    <div class="ui two wide column pusher" id="uiLeftTable">
+
+    <div class="ui sidebar" id="uiLeftSidebar">
+    <div id="uiLeftTable">
         <table class="ui celled table">
         <tbody>
         <tr>
@@ -77,11 +43,29 @@
 
         <div id="messages" class="ui info message"></div>
     </div>
-
-    <div id="paper_holder" class="ui twelve wide column">
-        <div id="myholder"></div>
     </div>
-</div>
 
+
+
+    <div class="pusher" style="height: 100%; width: 100%; overflow: hidden" id="id2">
+
+        <!-- ну или так, не паримся
+        <div class="ui vertical fixed left menu">
+        <button class="ui button" id="bConnect2">
+        Connect to kernel
+        </button>
+        <button class="ui disabled button" id="bSend2">
+        Send data
+        </button>
+        </div>
+         -->
+
+    <div id="paper_holder" style="height: 100%; width: 100%;">
+        <div id="myholder" style="overflow: hidden"></div>
+    </div>
+    </div>
+
+</body>
 
 {% end %}
+

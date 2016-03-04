@@ -31,39 +31,23 @@
 <script src="/static/joint/backbone.js"></script>
 <script src="/static/joint/joint.js"></script>
 <script src="/static/semantic/semantic.js"></script>
-{% end %}
 
+<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
 
-{% block head_custom %}
+<script src="/static/js/graph_jointjs.js"></script>
+<script src="/static/js/paperscroller.js"></script>
+<script src="/static/js/graph.js"></script>
+<script language="JavaScript">
+    var metabook = {
+        root: "{{root}}",
+        file_api_endpoint: "{{root}}/{{metabook_config.routes.api.file}}/",
+        file_id: "{% if 'new' in request.arguments %}{% else %}0123456789{% end %}",
+        path: "{{uri}}"
+    }
+</script>
+
 {% end %}
 
 {% block body %}
-<body>
 
-
-    {% block body_header %}
-        <div class="ui top inverted menu">
-
-            {% block header_nav_semantic %}
-            {% end %}
-
-            {% block header_title %}
-            {% end %}
-
-        </div>
-    {% end %}
-
-    {% block body_menu %}
-
-    {% end %}
-
-    {% block body_content_semantic %}
-
-    {% end %}
-
-    {% block body_footer %}
-
-    {% end %}
-
-</body>
 {% end %}

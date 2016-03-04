@@ -48,16 +48,19 @@ $(document).ready ->
 
     $.get(metabook.file_api_endpoint + metabook.path, init_graph)
 
-    $("#uiLeftSidebar").sidebar('setting', 'transition', 'overlay')
-    $("#uiLeftSidebar").sidebar('setting', 'dimPage', false)
-    $("#uiLeftSidebar").sidebar({context: $('#uiLeftTable')})
 
-    #$("#uiLeftSidebar").sidebar('toggle')
-    $("#uiLeftSidebar").sidebar('attach events', '#uiMenuToggle')
 
 init_graph = (graph_json) ->
     $("#el_file_contents").text(graph_json)
     source_obj = JSON.parse(graph_json)
     init_jointjs(source_obj)
+
+    $("#uiLeftSidebar").sidebar({context: $('#id2')})
+
+    $("#uiLeftSidebar").sidebar('setting', 'transition', 'overlay')
+    $("#uiLeftSidebar").sidebar('setting', 'dimPage', false)
+
+    $("#uiLeftSidebar").sidebar('attach events', '#uiMenuToggle')
+    $("#uiLeftSidebar").sidebar('setting', 'closable', false)
 
 

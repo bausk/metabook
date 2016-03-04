@@ -51,20 +51,21 @@ $(document).ready(function() {
     counter.increment();
     return alert(counter.getCount());
   });
-  $.get(metabook.file_api_endpoint + metabook.path, init_graph);
-  $("#uiLeftSidebar").sidebar('setting', 'transition', 'overlay');
-  $("#uiLeftSidebar").sidebar('setting', 'dimPage', false);
-  $("#uiLeftSidebar").sidebar({
-    context: $('#uiLeftTable')
-  });
-  return $("#uiLeftSidebar").sidebar('attach events', '#uiMenuToggle');
+  return $.get(metabook.file_api_endpoint + metabook.path, init_graph);
 });
 
 init_graph = function(graph_json) {
   var source_obj;
   $("#el_file_contents").text(graph_json);
   source_obj = JSON.parse(graph_json);
-  return init_jointjs(source_obj);
+  init_jointjs(source_obj);
+  $("#uiLeftSidebar").sidebar({
+    context: $('#id2')
+  });
+  $("#uiLeftSidebar").sidebar('setting', 'transition', 'overlay');
+  $("#uiLeftSidebar").sidebar('setting', 'dimPage', false);
+  $("#uiLeftSidebar").sidebar('attach events', '#uiMenuToggle');
+  return $("#uiLeftSidebar").sidebar('setting', 'closable', false);
 };
 
 //# sourceMappingURL=graph.js.map
