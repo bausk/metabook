@@ -4,7 +4,7 @@ var init_jointjs, paper;
 paper = void 0;
 
 init_jointjs = function(obj) {
-  var graph, link, offsetToLocalPoint, origin, panAndZoom, paper_holder, paperscale, rect, rect2;
+  var draggable, dragpoint, graph, link, offsetToLocalPoint, origin, paper_holder, paperscale, rect, rect2;
   paper_holder = $('#paper_holder');
   graph = new joint.dia.Graph();
   paper = new joint.dia.Paper({
@@ -75,17 +75,54 @@ init_jointjs = function(obj) {
       return paper.setOrigin(coord1 - newScale * p.x, coord2 - newScale * p.y);
     }
   });
-  panAndZoom = svgPanZoom($('#myholder'), {
-    viewportSelector: $('#v-2'),
-    fit: false,
-    zoomScaleSensitivity: 0.4,
-    panEnabled: false
-  });
+
+  /*
+  panAndZoom = svgPanZoom(
+      '#v-2',
+      {
+          #viewportSelector: $('#v-2'),
+          fit: false,
+          zoomScaleSensitivity: 0.4,
+          #panEnabled: false,
+          #zoomEnabled: false
+      }
+  )
+   */
+  draggable = false;
+  dragpoint = {
+    x: 0,
+    y: 0,
+    paper_x: 0,
+    paper_y: 0,
+    client_x: 0,
+    client_y: 0,
+    offset_x: 0,
+    offset_y: 0
+  };
   paper.on('blank:pointerdown', function(evt, x, y) {
-    return panAndZoom.enablePan();
+    var point;
+    evt = evt.originalEvent;
+    dragpoint.x = evt.pageX;
+    dragpoint.y = evt.pageY;
+    point = paper.svg.createSVGPoint().matrixTransform(paper.viewport.getCTM().inverse());
+    dragpoint.offset_x = point.x * V(paper.viewport).scale().sx;
+    dragpoint.offset_y = point.y * V(paper.viewport).scale().sy;
+    draggable = true;
+    return $("#messages").text('Pointer down, x:' + dragpoint.offset_x + ", y:" + dragpoint.offset_y);
   });
-  return paper.on('cell:pointerup blank:pointerup', function(cellView, event) {
-    return panAndZoom.disablePan();
+  $("#paper_holder").on("mousemove", function(e) {
+    if (draggable) {
+      $("#messages").text(e.originalEvent.pageX);
+      return paper.setOrigin(-dragpoint.offset_x + e.pageX - dragpoint.x, -dragpoint.offset_y + e.pageY - dragpoint.y);
+    }
+  });
+  $(window).on('mouseup', function(e) {
+    draggable = false;
+    return $("#messages").text('mouse up');
+  });
+  return paper.on('blank:pointerup', function(cellView, event) {
+    draggable = false;
+    return $("#messages").text('Pointer up');
   });
 };
 

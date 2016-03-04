@@ -63,26 +63,52 @@ init_jointjs = (obj) ->
             paper.setOrigin(coord1 - newScale * p.x, coord2 - newScale * p.y)
     )
 
+    ###
     panAndZoom = svgPanZoom(
-        $('#myholder'),
+        '#v-2',
         {
-            viewportSelector: $('#v-2'),
+            #viewportSelector: $('#v-2'),
             fit: false,
             zoomScaleSensitivity: 0.4,
-            panEnabled: false,
+            #panEnabled: false,
+            #zoomEnabled: false
         }
     )
 
+###
+    draggable = false
+    dragpoint = {x: 0, y:0, paper_x:0, paper_y:0, client_x:0, client_y:0, offset_x:0, offset_y:0}
+
     #Enable pan when a blank area is click (held) on
     paper.on('blank:pointerdown', (evt, x, y) ->
-        panAndZoom.enablePan()
+        evt = evt.originalEvent
+        #return if evt.which != 2
+        #alert(evt.which)
+        dragpoint.x = evt.pageX
+        dragpoint.y = evt.pageY
+        point = paper.svg.createSVGPoint().matrixTransform(paper.viewport.getCTM().inverse())
+        dragpoint.offset_x = point.x * V(paper.viewport).scale().sx
+        dragpoint.offset_y = point.y * V(paper.viewport).scale().sy
+        draggable = true
+        $("#messages").text('Pointer down, x:' + dragpoint.offset_x + ", y:" + dragpoint.offset_y)
+
     )
 
+    $("#paper_holder").on("mousemove", (e) ->
+        if(draggable)
+            $("#messages").text(e.originalEvent.pageX)
+            paper.setOrigin( -dragpoint.offset_x + e.pageX - dragpoint.x, -dragpoint.offset_y + e.pageY - dragpoint.y)
+    )
 
+    $(window).on('mouseup', (e) ->
+        draggable = false
+        $("#messages").text('mouse up')
+    )
 
     #//Disable pan when the mouse button is released
-    paper.on('cell:pointerup blank:pointerup', (cellView, event) ->
-        panAndZoom.disablePan()
+    paper.on('blank:pointerup', (cellView, event) ->
+        draggable = false
+        $("#messages").text('Pointer up')
     )
 
 
