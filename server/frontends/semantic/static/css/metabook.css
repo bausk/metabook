@@ -158,6 +158,11 @@
     font-family: 'Roboto';
 }
 
+body {
+    height: 100%;
+    /*overflow: hidden;*/
+}
+
 .ui.button
 {
     font-family: 'Roboto';
@@ -172,4 +177,23 @@
 #uiLeftTable
 {
   min-width: 200px;
+}
+
+#paper_holder
+{
+  height: 100%;
+  width: 100%;
+}
+
+#myholder
+{
+  height: 100%;
+  width: 100%;
+}
+
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 100%;
 }

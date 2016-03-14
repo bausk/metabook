@@ -3,12 +3,18 @@
 {% block body %}
 <body style="overflow: hidden">
 
-    <div class="ui top inverted menu">
+<div class="ui top inverted menu">
         <a class="item" id="uiMenuToggle"><i class="fa fa-list"></i>&nbsp;Menu</a>
         <a class="item" href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span>&nbsp;Home</a>
         <a class="item" href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span>&nbsp;To folder</a>
         <a class="item" href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span>&nbsp;Manage server</a>
         <div class="item"><h3>{{lpath}}</h3></div>
+</div>
+
+<div class="pushable" style="height: 100%; width: 100%; overflow: hidden" id="id2">
+
+    <div class="ui dimmer">
+        <div class="ui text loader">Loading Graph data from {{root}}...</div>
     </div>
 
 
@@ -42,12 +48,16 @@
         </div>
 
         <div id="messages" class="ui info message"></div>
+
     </div>
+
+
+
     </div>
 
 
 
-    <div class="pusher" style="height: 100%; width: 100%; overflow: hidden" id="id2">
+
 
         <!-- ну или так, не паримся
         <div class="ui vertical fixed left menu">
@@ -60,11 +70,29 @@
         </div>
          -->
 
-    <div id="paper_holder" style="height: 100%; width: 100%;">
+    <div id="paper_holder" class="pusher" style="height: 100%; width: 100%;">
         <div id="myholder" style="overflow: hidden"></div>
     </div>
-    </div>
 
+
+</div>
+
+
+<div id="context-menu" class="ui small vertical borderless menu context-menu">
+
+        <a href="#" class="item" data-action="View"><i class="fa fa-eye"></i> Duplicate <div class="ui small inverted label">Ctrl+D</div></a>
+
+        <a href="#" class="item" data-action="Edit" style="display:none"><i class="fa fa-edit"></i> Edit <div class="ui label">Ctrl+E</div></a>
+
+        <a href="#" class="item" data-action="Delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>
+
+</div>
+
+<div id="context-menu2" class="ui small vertical borderless menu context-menu">
+        <a href="#" class="item" data-action="Add"><i class="fa fa-edit"></i> Add Node <div class="ui small basic label">Ctrl+D</div></a>
+</div>
+
+<!--<script src="/static/libjs/context.js"></script>-->
 </body>
 
 {% end %}

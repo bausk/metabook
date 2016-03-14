@@ -31,7 +31,7 @@ class MainHandler(tornado.web.RequestHandler):
                 # is a directory
                 bisect.insort(dirlist, filename)
 
-            elif filename.endswith(metabook_config.extension):
+            elif any(filename.endswith(x) for x in metabook_config.extension):
                 # is a graph file
                 bisect.insort(filelist, filename)
 

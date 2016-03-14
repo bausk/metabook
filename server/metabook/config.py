@@ -12,8 +12,8 @@ class Struct:
 
 metabook_config = Struct(**ServerConfig)
 
-metabook_config.extension = ".graph"
-metabook_config.param = ".graph"
+metabook_config.extension = [".graph", ".ipynb"]
+#metabook_config.param = ".graph"
 metabook_config.routes = Struct()
 metabook_config.routes.tree = "tree"
 metabook_config.routes.graph = "graph"
