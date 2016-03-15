@@ -18,12 +18,15 @@ Settings =
         "Delete": func_delete
     id:
         messages: "#messages"
+        coords: "#coords"
         graph_container: "#paper_holder"
         paper: "#myholder"
         svg: "#v-2"
-    obj:
-        paper: undefined
-        graph: undefined
+
+Obj =
+    graph: undefined
+    mainpaper: undefined
+
 
 $(document).ready ->
     WebSocketTest = undefined
@@ -103,7 +106,7 @@ init_graph = (graph_json) ->
     #attach context menu events
     ContextMenu.init(Settings)
     bind_ui_actions(Settings)
-    jointjs_attach_events(Settings.obj.paper, Settings.obj.graph)
+    jointjs_attach_events(Obj.mainpaper, Obj.graph)
 
 bind_ui_actions = (settings) ->
     $("[data-action]").on('click', (e) ->
