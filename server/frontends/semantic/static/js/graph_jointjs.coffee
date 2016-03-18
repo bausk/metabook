@@ -27,16 +27,72 @@ init_jointjs = (obj) ->
     #todo
     #for cell in cells
     #    cell.
-    el1 = new joint.shapes.html.Element({ position: { x: 80, y: 80 }, size: { width: 170, height: 100 }, label: 'I am HTML', select: 'one' })
-    el2 = new joint.shapes.html.Element({ position: { x: 370, y: 160 }, size: { width: 170, height: 100 }, label: 'Me too', select: 'two' })
+
+
+
+    # element MODELS
+    el1 = new joint.shapes.html.Element(
+        position: { x: 80, y: 80 }
+        size: { width: 170, height: 100 }
+        label: 'I am HTML', select: 'one'
+        outPorts: ['out']
+        attrs:
+            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 }
+            rect: { fill: '#2ECC71' }
+            '.inPorts circle': { fill: '#16A085' }
+            '.outPorts circle': { fill: '#E74C3C' }
+    )
+
+    el2 = new joint.shapes.html.Node(
+        position: { x: 300, y: 80 }
+        size: { width: 370, height: 100 }
+        label: 'I am HTML too', select: 'one'
+        inPorts: ['in1']
+        outPorts: ['out']
+        attrs:
+            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 }
+            rect: { fill: 'transparent', 'stroke-opacity': 0 }
+            #'.inPorts circle': { fill: '#16A085' }
+            '.outPorts circle': { stroke: '#666666' }
+    )
+
+    el3 = new joint.shapes.devs.Model(
+        position: { x: 50, y: 50 }
+        size: { width: 90, height: 290 }
+        inPorts: ['in1','in2','in3','in4']
+        outPorts: ['out']
+        attrs:
+            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 }
+            rect: { fill: '#2ECC71' }
+            '.inPorts circle': { fill: '#16A085' }
+            '.outPorts circle': { fill: '#E74C3C' }
+    )
+
+    el3.set 'size', {width: 90, height: 190}
+    # Custom shapes registration is now done in initialize() of ElementView
     #custom_shapes.push(el1, el2)
     l = new joint.dia.Link({
         source: { id: el1.id },
         target: { id: el2.id },
         attrs: { '.connection': { 'stroke-width': 5, stroke: '#34495E' } }
+
     })
 
-    graph.addCells([el1, el2, l])
+
+    l2 = new joint.shapes.html.Link({
+        smooth: true
+        source:
+            id: el3.id
+            port: 'out'
+        target:
+            id: el2.id
+            port: 'in1'
+        attrs: { '.connection': { 'stroke-width': 5, stroke: '#34495E' } }
+    })
+
+    el2.set('z', 1)
+    l.set('z', 100)
+    graph.addCells([el1, el2, el3, l, l2])
 
 
     ###

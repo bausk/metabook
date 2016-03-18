@@ -1,158 +1,88 @@
-joint.shapes.html = {}
 
-GraphPaper = joint.dia.Paper.extend(
+joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
+    {},
+    joint.shapes.basic.PortsModelInterface,
+        markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
+        portMarkup: '<g class="port port<%= id %>"><circle class="port-body"/></g>',
 
-    origin:
-        x: 0
-        y: 0
-    current_scale: 1
+        defaults: joint.util.deepSupplement({
 
-    #Draggable solution
-    #http://stackoverflow.com/questions/28431384/how-to-make-a-paper-draggable
-    #fit to screen using flexbox
-    #http://stackoverflow.com/questions/90178/make-a-div-fill-the-height-of-the-remaining-screen-space
-    draggable: false
-    dragpoint: {x: 0, y:0, offset_x:0, offset_y:0}
+            type: 'html.Node',
+            size: { width: 1, height: 1 },
 
-    initialize: ->
+            inPorts: [],
+            outPorts: [],
 
-        joint.dia.Paper.prototype.initialize.apply(this, arguments)
-        #_.bindAll is prolly not needed
-        _.bindAll(this, 'offsetToLocalPoint', 'updateOrigin', 'updateScale', 'getRealCoords')
-        @updateOrigin()
-        @updateScale()
+            attrs:
+                rect:
+                    stroke: 'none', 'fill-opacity': 0
+                '.':
+                    magnet: false
+                '.body':
+                    width: 150, height: 250
+                    stroke: '#000000'
+                '.port-body':
+                    r: 10
+                    magnet: true
+                    stroke: '#000000'
+                text:
+                    'pointer-events': 'none'
+                '.label':
+                    text: 'Model', 'ref-x': .5, 'ref-y': 10, ref: '.body', 'text-anchor': 'middle', fill: '#000000'
+                '.inPorts .port-label':
+                    x:-15, dy: 4, 'text-anchor': 'end', fill: '#000000'
+                '.outPorts .port-label':
+                    x: 15, dy: 4, fill: '#000000'
+                '.inPorts .port-body': fill: '#333333'
+                '.outPorts .port-body': fill: '#666666'
+        }, joint.shapes.basic.Generic.prototype.defaults),
+        getPortAttrs: (portName, index, total, selector, type) ->
 
-        $(window).resize( _.bind(( ->
-            @setDimensions(@$el.width(), @$el.height())
-        ), this)
-        )
+            attrs = {}
+            portClass = 'port' + index
+            portSelector = selector + '>.' + portClass
+            portLabelSelector = portSelector + '>.port-label'
+            portBodySelector = portSelector + '>.port-body'
 
-        @on('cell:pointerdown cell:mouseover', (cellView, evt, x, y) ->
-            if $(evt.target).parent().hasClass("link")
-                cellView.options.interactive = false
-        )
-
-        @on('all', (evt, x, y) ->
-            console.log(evt)
-        )
-
-        #Enable pan when a /blank/ not blank, any area is click (held) on
-        @$el.on('mousedown', _.bind(((evt, x, y) ->
-            evt.preventDefault()
-            evt = evt.originalEvent
-            return if evt.which != 2
-            @dragpoint.x = evt.pageX
-            @dragpoint.y = evt.pageY
-            @dragpoint.offset_x = @origin.x * @current_scale
-            @dragpoint.offset_y = @origin.y * @current_scale
-            @draggable = true
-        ), this)
-        )
-
-
-
-        @$el.on("mousewheel", _.bind(((ev) ->
-            ev.preventDefault()
-            #Context.context.toggleMenuOff()
-            ev = ev.originalEvent
-
-            coord1 = $(ev.target).offset().left + ev.offsetX - @$el.offset().left
-            coord2 = $(ev.target).offset().top + ev.offsetY - @$el.offset().top
-            #alert(ev.wheelDelta)
-            delta = 1.2
-            p = @offsetToLocalPoint(coord1, coord2)
-            #p = V(paper.viewport).toLocalPoint(coord1, coord2)
-            if ev.wheelDelta < 0
-                newScale = @current_scale / delta
-            else
-                newScale = @current_scale * delta
-
-            if newScale > 0.1 && newScale < 10
-                @scale(newScale, newScale)
-                @setOrigin(coord1 - newScale * p.x, coord2 - newScale * p.y)
-                @updateScale()
-                @updateOrigin()
-
-                #cells = paper.model.getCells()
-                #for cell in cells
-                #    cell.set('a', 1)
-
-                for elem in custom_shapes
-                    elem.updateBox()
-        ), this)
-        )
-
-        #pan event
-        @$el.on("mousemove", _.bind(((e) ->
-            if(@draggable)
-                @setOrigin( -@dragpoint.offset_x + e.pageX - @dragpoint.x, -@dragpoint.offset_y + e.pageY - @dragpoint.y)
-                @updateOrigin()
-                for elem in custom_shapes
-                    elem.updateBox()
-        ), this)
-        )
-
-        #end panning
-        $(window).on('mouseup', (e) ->
-            @draggable = false
-            #$(Settings.id.messages).text('mouse up')
-        )
-
-        #//Disable pan when the mouse button is released
-        @on('blank:pointerup', (cellView, event) ->
-            @draggable = false
-            #$(Settings.id.messages).text('Pointer up')
-        )
-
-
-    offsetToLocalPoint: (offsetX, offsetY) ->
-      svgPoint = @svg.createSVGPoint()
-      svgPoint.x = offsetX
-      svgPoint.y = offsetY
-      svgPoint.matrixTransform(@viewport.getCTM().inverse())
-
-    updateScale: ->
-      @current_scale = V(@viewport).scale().sx
-
-    updateOrigin: ->
-      @origin = @svg.createSVGPoint().matrixTransform(@viewport.getCTM().inverse())
-
-    getRealCoords: (modelX, modelY) ->
-      offset = @origin
-      x = (modelX - offset.x) * @current_scale
-      y = (modelY - offset.y) * @current_scale
-      $(Settings.id.coords).text(modelX + ":" + modelY + "/" + x + ":" + y)
-      return {x, y}
-
-    getModelCoords: (pageX, pageY) ->
-      offset = @origin
-      x = pageX / @current_scale + offset.x
-      y = pageY / @current_scale + offset.y
-      return {x, y}
-)
-
-
-
-
-joint.shapes.html.Element = joint.shapes.basic.Rect.extend(
-    defaults: joint.util.deepSupplement(
-        type: 'html.Element'
-        attrs:
-            rect: { stroke: 'none', 'fill-opacity': 0 }
-        joint.shapes.basic.Rect.prototype.defaults
+            attrs[portLabelSelector] = { text: portName }
+            attrs[portBodySelector] =
+                port:
+                    id: portName || _.uniqueId(type)
+                    type: type
+            attrs[portSelector] = { ref: '.body', 'ref-y': (index + 0.5) * (1 / total) }
+            if selector is '.outPorts'
+                attrs[portSelector]['ref-dx'] = 0
+            return attrs
     )
 )
 
-joint.shapes.html.ElementView = joint.dia.ElementView.extend(
+
+joint.shapes.html.Atomic = joint.shapes.html.Node.extend(defaults: joint.util.deepSupplement({
+    type: 'html.Atomic'
+    size:
+        width: 80
+        height: 80
+    attrs:
+        '.body': fill: 'salmon'
+        '.label': text: 'Atomic'
+        '.inPorts .port-body': fill: '#333333'
+        '.outPorts .port-body': fill: '#666666'
+}, joint.shapes.html.Node::defaults))
+
+
+joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface,
     template: [
-        '<div style="position:absolute">',
-        '<table class="ui table">',
-        '<button class="ui delete button">x</button>',
-        '<label class="ui label"></label>',
-        '<span></span>', '<br/>',
-        '<select><option>--</option><option>one</option><option>two</option></select>',
-        '<input type="text" value="I\'m HTML input" />',
-        '</table>',
+        '<div style="position:absolute">'
+        '<table class="ui very compact table">'
+        '<thead><tr><th colspan="3" class="node_heading"></th></tr></thead>'
+        '<tr><td><label class="ui small label">x</label></td>'
+        '<td><label class="ui label"></label></td>'
+        '<td><span></span></td></tr>'
+        '<tr><td>InPort</td>'
+        '<td style="width:70%"><input type="text" value="I\'m HTML input" /></td>'
+        '<td>OutPort</td></tr>'
+        '<tfoot><tr><th colspan="3" class="node_footing"></th></tr></tfoot>'
+        '</table>'
         '</div>'
     ].join('')
 
@@ -162,6 +92,7 @@ joint.shapes.html.ElementView = joint.dia.ElementView.extend(
         joint.dia.ElementView.prototype.initialize.apply(this, arguments)
         @isdraggable = false
         @dragpoint = {x: 0, y:0, paper_x:0, paper_y:0, client_x:0, client_y:0, offset_x:0, offset_y:0}
+        alert @model
 
         # TODO
 
@@ -235,7 +166,7 @@ joint.shapes.html.ElementView = joint.dia.ElementView.extend(
         custom_shapes.push(this)
 
 
-        #this.listenTo(this.model, 'process:ports', this.update)
+        #this.listenTo(@model, 'process:ports', @update)
         ##joint.dia.ElementView.prototype.initialize.apply(this, arguments)
 
 
@@ -286,3 +217,13 @@ joint.shapes.html.ElementView = joint.dia.ElementView.extend(
     removeBox: (evt) ->
         @$box.remove()
 )
+)
+
+
+joint.shapes.html.Link = joint.dia.Link.extend({
+
+    defaults: {
+        type: 'html.Link',
+        attrs: { '.connection' : { 'stroke-width' :  2 }}
+    }
+});

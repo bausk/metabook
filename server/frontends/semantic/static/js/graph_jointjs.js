@@ -6,7 +6,7 @@ graphics = {};
 custom_shapes = [];
 
 init_jointjs = function(obj) {
-  var cells, el1, el2, graph, l, paper, paper_holder, setting_increment_x, setting_increment_y, setting_start_x, setting_start_y;
+  var cells, el1, el2, el3, graph, l, l2, paper, paper_holder, setting_increment_x, setting_increment_y, setting_start_x, setting_start_y;
   paper_holder = $(Settings.id.graph_container);
   Obj.graph = new joint.dia.Graph();
   Obj.mainpaper = new GraphPaper({
@@ -33,19 +33,84 @@ init_jointjs = function(obj) {
       height: 100
     },
     label: 'I am HTML',
-    select: 'one'
+    select: 'one',
+    outPorts: ['out'],
+    attrs: {
+      '.label': {
+        text: 'Model',
+        'ref-x': .4,
+        'ref-y': .2
+      },
+      rect: {
+        fill: '#2ECC71'
+      },
+      '.inPorts circle': {
+        fill: '#16A085'
+      },
+      '.outPorts circle': {
+        fill: '#E74C3C'
+      }
+    }
   });
-  el2 = new joint.shapes.html.Element({
+  el2 = new joint.shapes.html.Node({
     position: {
-      x: 370,
-      y: 160
+      x: 300,
+      y: 80
     },
     size: {
-      width: 170,
+      width: 370,
       height: 100
     },
-    label: 'Me too',
-    select: 'two'
+    label: 'I am HTML too',
+    select: 'one',
+    inPorts: ['in1'],
+    outPorts: ['out'],
+    attrs: {
+      '.label': {
+        text: 'Model',
+        'ref-x': .4,
+        'ref-y': .2
+      },
+      rect: {
+        fill: 'transparent',
+        'stroke-opacity': 0
+      },
+      '.outPorts circle': {
+        stroke: '#666666'
+      }
+    }
+  });
+  el3 = new joint.shapes.devs.Model({
+    position: {
+      x: 50,
+      y: 50
+    },
+    size: {
+      width: 90,
+      height: 290
+    },
+    inPorts: ['in1', 'in2', 'in3', 'in4'],
+    outPorts: ['out'],
+    attrs: {
+      '.label': {
+        text: 'Model',
+        'ref-x': .4,
+        'ref-y': .2
+      },
+      rect: {
+        fill: '#2ECC71'
+      },
+      '.inPorts circle': {
+        fill: '#16A085'
+      },
+      '.outPorts circle': {
+        fill: '#E74C3C'
+      }
+    }
+  });
+  el3.set('size', {
+    width: 90,
+    height: 190
   });
   l = new joint.dia.Link({
     source: {
@@ -61,7 +126,26 @@ init_jointjs = function(obj) {
       }
     }
   });
-  return graph.addCells([el1, el2, l]);
+  l2 = new joint.shapes.html.Link({
+    smooth: true,
+    source: {
+      id: el3.id,
+      port: 'out'
+    },
+    target: {
+      id: el2.id,
+      port: 'in1'
+    },
+    attrs: {
+      '.connection': {
+        'stroke-width': 5,
+        stroke: '#34495E'
+      }
+    }
+  });
+  el2.set('z', 1);
+  l.set('z', 100);
+  return graph.addCells([el1, el2, el3, l, l2]);
 
   /*
   rect = new joint.shapes.basic.Rect({
