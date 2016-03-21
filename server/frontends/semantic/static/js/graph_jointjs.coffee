@@ -13,6 +13,7 @@ init_jointjs = (obj) ->
         height: paper_holder.height(),
         model: Obj.graph,
         gridSize: 1
+        defaultLink: new joint.shapes.html.Link
     })
 
     paper = Obj.mainpaper
@@ -21,7 +22,7 @@ init_jointjs = (obj) ->
     cells = obj.cells
     setting_start_x = 30
     setting_start_y = 30
-    setting_increment_x = 200
+    setting_increment_x = 400
     setting_increment_y = 100
 
     #todo
@@ -29,88 +30,75 @@ init_jointjs = (obj) ->
     #    cell.
 
 
+    # 1. obj is our input.
+    # 2. metabook is our keys and settings
+    # root: "{{root}}",
+    # file_api_endpoint: "{{root}}/{{metabook_config.routes.api.file}}/",
+    # file_id: "{% if 'new' in request.arguments %}{% else %}0123456789{% end %}",
+    # path: "{{uri}}"
+    # 3. branch for new vs saved notebook
+    elements = []
+    links = []
 
-    # element MODELS
-    el1 = new joint.shapes.html.Element(
-        position: { x: 80, y: 80 }
-        size: { width: 170, height: 100 }
-        label: 'I am HTML', select: 'one'
-        outPorts: ['out']
-        attrs:
-            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 }
-            rect: { fill: '#2ECC71' }
-            '.inPorts circle': { fill: '#16A085' }
-            '.outPorts circle': { fill: '#E74C3C' }
-    )
+    if metabook.file_id is ""
+        # new notebook
+        elements.push(
+            new joint.shapes.html.Node(
+                position: { x: setting_start_x, y: setting_start_y }
+            )
+        )
+    else
+        prev_node = undefined
+        # existing notebook
+        code_cells = _.filter(obj.cells, (o) -> o['cell_type'] is "code")
+        for pycell in code_cells
 
-    el2 = new joint.shapes.html.Node(
-        position: { x: 300, y: 80 }
-        size: { width: 370, height: 100 }
-        label: 'I am HTML too', select: 'one'
-        inPorts: ['in1']
-        outPorts: ['out']
-        attrs:
-            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 }
-            rect: { fill: 'transparent', 'stroke-opacity': 0 }
-            #'.inPorts circle': { fill: '#16A085' }
-            '.outPorts circle': { stroke: '#666666' }
-    )
+            node = new joint.shapes.html.Node(
+                position: { x: setting_start_x, y: setting_start_y }
+                metabook:
+                    content: pycell.source.join("<br/>\n")
+                    footing_content: "ipynb cell [#{pycell.execution_count}]"
+            )
+            elements.push(node)
+            if prev_node
+                link = new joint.shapes.html.Link(
+                    source:
+                        id: prev_node.id
+                        port: 'out1'
+                    target:
+                        id: node.id
+                        port: 'in1'
+                )
+                links.push(link)
+            prev_node = node
+            setting_start_x += setting_increment_x
+            setting_start_y += setting_increment_y
 
-    el3 = new joint.shapes.devs.Model(
-        position: { x: 50, y: 50 }
-        size: { width: 90, height: 290 }
-        inPorts: ['in1','in2','in3','in4']
-        outPorts: ['out']
-        attrs:
-            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 }
-            rect: { fill: '#2ECC71' }
-            '.inPorts circle': { fill: '#16A085' }
-            '.outPorts circle': { fill: '#E74C3C' }
-    )
 
-    el3.set 'size', {width: 90, height: 190}
+
+
+
+    #el2 = new joint.shapes.html.Node(
+    #    position: { x: 400, y: 80 }
+    #)
+
     # Custom shapes registration is now done in initialize() of ElementView
     #custom_shapes.push(el1, el2)
-    l = new joint.dia.Link({
-        source: { id: el1.id },
-        target: { id: el2.id },
-        attrs: { '.connection': { 'stroke-width': 5, stroke: '#34495E' } }
 
-    })
-
-
+    ###
     l2 = new joint.shapes.html.Link({
-        smooth: true
         source:
-            id: el3.id
-            port: 'out'
+            id: el1.id
+            port: 'out1'
         target:
             id: el2.id
             port: 'in1'
-        attrs: { '.connection': { 'stroke-width': 5, stroke: '#34495E' } }
     })
-
-    el2.set('z', 1)
-    l.set('z', 100)
-    graph.addCells([el1, el2, el3, l, l2])
-
-
     ###
-    rect = new joint.shapes.basic.Rect({
-        position: { x: 100, y: 30 },
-        size: { width: 100, height: 30 },
-        attrs: { rect: { fill: "blue" }, text: { text: 'my box', fill: 'white' } }
-    })
 
-    rect2 = rect.clone()
-    rect2.translate(300)
-    link = new joint.dia.Link({
-        source: { id: rect.id },
-        target: { id: rect2.id }
-    })
+    graph.addCells([elements..., links...])
 
-    graph.addCells([rect, rect2, link])
-    ###
+
 
 
 jointjs_attach_events = (paper, graph) ->

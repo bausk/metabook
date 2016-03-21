@@ -197,3 +197,29 @@ body {
   height: 100%;
   width: 100%;
 }
+
+th.node_head {
+  cursor: pointer!important;
+}
+
+th.node_head:hover {
+  background: #e3e3e3!important;
+}
+
+.node_head .head_content {
+
+}
+
+.node_head .btn_close {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+
+.node_content {
+  min-width:200px;
+}
+
+.node_content .content {
+
+}
