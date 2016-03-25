@@ -9473,14 +9473,16 @@ joint.shapes.basic.PortsModelInterface = {
 
         var attrs = {};
 
+        var portlength = _.zip(this.get('inPorts'), this.get('outPorts')).length
+
         _.each(this.get('inPorts'), function(portName, index, ports) {
-            var portAttributes = this.getPortAttrs(portName, index, ports.length, '.inPorts', 'in');
+            var portAttributes = this.getPortAttrs(portName, index, portlength, '.inPorts', 'in');
             this._portSelectors = this._portSelectors.concat(_.keys(portAttributes));
             _.extend(attrs, portAttributes);
         }, this);
 
         _.each(this.get('outPorts'), function(portName, index, ports) {
-            var portAttributes = this.getPortAttrs(portName, index, ports.length, '.outPorts', 'out');
+            var portAttributes = this.getPortAttrs(portName, index, portlength, '.outPorts', 'out');
             this._portSelectors = this._portSelectors.concat(_.keys(portAttributes));
             _.extend(attrs, portAttributes);
         }, this);

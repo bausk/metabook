@@ -98,7 +98,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
     };
     attrs[portSelector] = {
       ref: '.body',
-      'ref-y': (index + 0.5) * (1 / total)
+      'ref-y': (39 / 38 + 0.5 + index) / (39 / 38 + total)
     };
     if (selector === '.outPorts') {
       attrs[portSelector]['ref-dx'] = 0;
@@ -280,7 +280,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     }), this));
   },
   updateBox: function() {
-    var bbox, ref, scale, x, y;
+    var bbox, height0, height1, height2, heightall, ref, scale, x, y;
     bbox = this.model.getBBox();
     ref = this.paper.getRealCoords(bbox.x, bbox.y), x = ref.x, y = ref.y;
     bbox.x = x;
@@ -300,9 +300,13 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
       top: bbox.y,
       transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg) scale(' + scale + ')'
     });
+    height0 = parseInt(this.$box.find('thead').css('height'));
+    height1 = parseInt(this.$box.find('tbody').css('height'));
+    height2 = parseInt(this.$box.find('tbody tr').last().css('height'));
+    heightall = height0 + height1 - height2;
     this.model.set('size', {
       width: parseInt(this.$box.css('width')),
-      height: parseInt(this.$box.css('height'))
+      height: heightall
     });
     return hljs.highlightBlock(this.$box.find('.node_viewer')[0]);
   },

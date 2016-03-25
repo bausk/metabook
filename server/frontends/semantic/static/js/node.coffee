@@ -64,7 +64,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
                 port:
                     id: portName || _.uniqueId(type)
                     type: type
-            attrs[portSelector] = { ref: '.body', 'ref-y': (index + 0.5) * (1 / total) }
+            attrs[portSelector] = { ref: '.body', 'ref-y': (39/38 + 0.5 + index) / (39/38 + total) }
             if selector is '.outPorts'
                 attrs[portSelector]['ref-dx'] = 0
             return attrs
@@ -329,9 +329,16 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         @$box.css('transform-origin', 'left top')
         # TODO: invert update to make model dependent on @$box size
         @$box.css({ left: bbox.x, top: bbox.y, transform: 'rotate(' + (@model.get('angle') || 0) + 'deg) scale(' + scale + ')'})
+
+        # compute height by collecting thead+tbody height minus last tr
+        height0 = parseInt(@$box.find('thead').css('height'))
+        height1 = parseInt( @$box.find('tbody').css('height'))
+        height2 = parseInt( @$box.find('tbody tr').last().css('height'))
+        heightall = height0 + height1 - height2
+
         @model.set('size',
             width: parseInt(@$box.css('width'))
-            height: parseInt(@$box.css('height'))
+            height: heightall
         )
         hljs.highlightBlock(@$box.find('.node_viewer')[0])
         # @$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (@model.get('angle') || 0) + 'deg) scale(' + scale + ')'})
