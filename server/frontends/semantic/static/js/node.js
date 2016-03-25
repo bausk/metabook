@@ -11,8 +11,8 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
       width: 350,
       height: 100
     },
-    inPorts: ['in1'],
-    outPorts: ['out1'],
+    inPorts: ['In[0]'],
+    outPorts: ['Out[0]'],
     attrs: {
       rect: {
         stroke: 'none',
@@ -70,10 +70,14 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
         fill: '#666666'
       }
     },
-    metabook: {
-      head_content: 'Cell: ID',
-      content: 'Click to edit code',
-      footing_content: 'Version A4D3E453'
+    head_content: 'Cell: ID',
+    content: 'Click to edit code',
+    footing_content: 'Version A4D3E453',
+    node_markup: {
+      head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>',
+      node_viewer: '<div class="node_viewer"></div>',
+      node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>',
+      footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
     }
   }, joint.shapes.basic.Generic.prototype.defaults),
   getPortAttrs: function(portName, index, total, selector, type) {
@@ -103,35 +107,14 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
   }
 }));
 
-joint.shapes.html.Atomic = joint.shapes.html.Node.extend({
-  defaults: joint.util.deepSupplement({
-    type: 'html.Atomic',
-    size: {
-      width: 80,
-      height: 80
-    },
-    attrs: {
-      '.body': {
-        fill: 'salmon'
-      },
-      '.label': {
-        text: 'Atomic'
-      },
-      '.inPorts .port-body': {
-        fill: '#333333'
-      },
-      '.outPorts .port-body': {
-        fill: '#666666'
-      }
-    }
-  }, joint.shapes.html.Node.prototype.defaults)
-});
-
 joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface, {
-  template: ['<div style="position:absolute">', '<table class="ui very compact celled table">', '<thead><tr><th colspan="3" class="node_head"><span class="head_content">Code Cell: FGFDG3456FGDFE</span><label class="ui very small label btn_close"><span class="fa fa-close"></span></label></th></tr></thead>', '<tr><td class="node_in">In1</td>', '<td class="node_content" rowspan="2"><span class="content" style="font-family: monospace"></span></td>', '<td class="node_out">Out1</td></tr>', '<tr><td class="node_in">InPort</td>', '<td class="node_out">OutPort</td></tr>', '<tfoot><tr><th colspan="3" class="node_footing"><span class="ui small label footing_content" style="font-family: monospace">Python file</span></th></tr></tfoot>', '</table>', '</div>'].join(''),
+  template: ['<div style="position:absolute" class="node_container">', '<table class="ui very compact celled table node_table">', '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>', '<tbody><tr class="content_row"><td class="node_empty"></td>', '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>', '<td class="node_empty"></td></tr></tbody>', '<tfoot><tr><th colspan="3" class="node_footing"><%= footing %></th></tr></tfoot>', '</table>', '</div>'].join(''),
+  content: {},
   initialize: function() {
     joint.dia.ElementView.prototype.initialize.apply(this, arguments);
     this.isdraggable = false;
+    this.isedited = false;
+    this.isrendered = false;
     this.dragpoint = {
       x: 0,
       y: 0,
@@ -142,7 +125,9 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
       offset_x: 0,
       offset_y: 0
     };
-    this.$box = $(_.template(this.template)());
+    this.$box = $(_.template(this.template)(this.model.get('node_markup')));
+    this.$box.find('.node_editor').addClass('invisible');
+    this.$box.find('.node_viewer').css(this.model.get('dimensions'));
     this.$box.find('th.node_head').on('mousedown', _.bind((function(evt) {
       var point, point2;
       evt = evt.originalEvent;
@@ -198,12 +183,18 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     this.$box.find('.btn_close').on('click', _.bind(this.model.remove, this.model));
     this.model.on('change', this.updateBox, this);
     this.model.on('remove', this.removeBox, this);
-    return custom_shapes.push(this);
+    custom_shapes.push(this);
+    this.$box.find('.node_content').on('click', _.bind(this.startEditInPlace, this));
+    return this.model.on('change:inPorts change:outPorts', _.bind(this.render, this));
   },
   render: function() {
+    this.processPorts();
     joint.dia.ElementView.prototype.render.apply(this, arguments);
-    this.paper.$el.prepend(this.$box);
+    if (this.isrendered === false) {
+      this.paper.$el.prepend(this.$box);
+    }
     this.updateBox();
+    this.isrendered = true;
     return this;
   },
 
@@ -228,6 +219,66 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
               $outPorts.append(V(portTemplate({ id: index, port: port })).node);
           )
    */
+  processPorts: function() {
+    var $filler_cells, pairs, rows;
+    $filler_cells = this.$box.find('td.node_empty').clone();
+    this.$box.find('tbody tr').not(':first').remove();
+    pairs = _.zip(this.model.get('inPorts'), this.model.get('outPorts'));
+    rows = 1;
+    _.each(pairs, _.bind(function(pair) {
+      var ref, ref1;
+      this.$box.find('tbody tr:last td').first().replaceWith("<td class='node_in'>" + ((ref = pair[0]) != null ? ref : "") + "</td>");
+      this.$box.find('tbody tr:last td').last().replaceWith("<td class='node_out'>" + ((ref1 = pair[1]) != null ? ref1 : "") + "</td>");
+      this.$box.find('tbody tr:last').after('<tr><td class="node_empty"></td><td class="node_empty"></td></tr>');
+      return rows++;
+    }, this));
+    return this.$box.find('.node_content').attr('rowspan', rows);
+  },
+  startEditInPlace: function() {
+    this.$box.find('.node_viewer').addClass('invisible');
+    this.$box.find('.node_coupled').css('width', parseInt(this.$box.find('.node_viewer').css('width')) + 6);
+    this.$box.find('.node_coupled').css('height', parseInt(this.$box.find('.node_viewer').css('height')) + 6);
+    this.$box.find('.node_editor').removeClass('invisible').find('.node_coupled').focus();
+    this.isedited = true;
+    this.$box.find('.node_editor').on('mousemove', function(evt) {
+      return evt.stopPropagation();
+    });
+    this.$box.find('.node_coupled').on('keydown', _.bind((function(evt) {
+      if (evt.keyCode === 27) {
+        this.isedited = false;
+        this.$box.find('.node_coupled').blur();
+      }
+      if (evt.keyCode === 13 && evt.ctrlKey === true) {
+        return this.$box.find('.node_coupled').blur();
+      }
+    }), this));
+    this.$box.find('.node_coupled').on('keyup', _.bind((function(evt) {
+      var newcontent, textarea, view;
+      textarea = this.$box.find('.node_coupled');
+      view = this.$box.find('.node_viewer');
+      newcontent = textarea.val();
+      view.html(newcontent);
+      textarea.css('width', parseInt(view.css('width')) + 6);
+      return textarea.css('height', parseInt(view.css('height')) + 6);
+    }), this));
+    this.$box.find('.node_coupled').on('mousewheel', _.bind((function(evt) {
+      return evt.stopPropagation();
+    }), this));
+    return this.$box.find('.node_coupled').on('blur', _.bind((function(evt) {
+      var newcontent, textarea, view;
+      textarea = this.$box.find('.node_coupled');
+      view = this.$box.find('.node_viewer');
+      newcontent = textarea.val();
+      if (this.isedited === true) {
+        this.model.set('content', newcontent);
+        view.html(newcontent);
+      }
+      this.isedited = false;
+      this.$box.find('.node_editor').addClass('invisible');
+      this.$box.find('.node_viewer').removeClass('invisible');
+      return this.updateBox();
+    }), this));
+  },
   updateBox: function() {
     var bbox, ref, scale, x, y;
     bbox = this.model.getBBox();
@@ -238,16 +289,22 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     $(Settings.id.messages).text(bbox.x + "//" + bbox.y);
     this.$box.find('label').text(this.model.get('label'));
     this.$box.find('span').text(this.model.get('select'));
-    this.$box.find('.content').html(this.model.get('metabook').content);
-    this.$box.find('.footing_content').html(this.model.get('metabook').footing_content);
+    this.$box.find('.node_viewer').html(this.model.get('content'));
+    if (this.isedited === false) {
+      this.$box.find('.node_coupled').val(this.model.get('content'));
+    }
+    this.$box.find('.content_footing').html(this.model.get('footing_content'));
     this.$box.css('transform-origin', 'left top');
-    return this.$box.css({
-      width: bbox.width,
-      height: bbox.height,
+    this.$box.css({
       left: bbox.x,
       top: bbox.y,
       transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg) scale(' + scale + ')'
     });
+    this.model.set('size', {
+      width: parseInt(this.$box.css('width')),
+      height: parseInt(this.$box.css('height'))
+    });
+    return hljs.highlightBlock(this.$box.find('.node_viewer')[0]);
   },
   removeBox: function(evt) {
     return this.$box.remove();

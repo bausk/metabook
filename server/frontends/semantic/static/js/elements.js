@@ -33,11 +33,11 @@ GraphPaper = joint.dia.Paper.extend({
       return console.log(evt);
     });
     this.$el.on('mousedown', _.bind((function(evt, x, y) {
-      evt.preventDefault();
       evt = evt.originalEvent;
       if (evt.which !== 2) {
         return;
       }
+      evt.preventDefault();
       this.dragpoint.x = evt.pageX;
       this.dragpoint.y = evt.pageY;
       this.dragpoint.offset_x = this.origin.x * this.current_scale;

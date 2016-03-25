@@ -23,7 +23,7 @@ init_jointjs = function(obj) {
   cells = obj.cells;
   setting_start_x = 30;
   setting_start_y = 30;
-  setting_increment_x = 400;
+  setting_increment_x = 500;
   setting_increment_y = 100;
   elements = [];
   links = [];
@@ -46,21 +46,31 @@ init_jointjs = function(obj) {
           x: setting_start_x,
           y: setting_start_y
         },
-        metabook: {
-          content: pycell.source.join("<br/>\n"),
-          footing_content: "ipynb cell [" + pycell.execution_count + "]"
-        }
+        content: pycell.source.join(""),
+        footing_content: "ipynb cell [" + pycell.execution_count + "]",
+        node_markup: {
+          node_viewer: '<div class="node_viewer python" data-metabook="true"></div>',
+          node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
+        },
+        dimensions: {
+          'min-height': 100,
+          'max-height': 200,
+          'min-width': 250,
+          'max-width': 500
+        },
+        inPorts: ['in:locals'],
+        outPorts: ['out:locals']
       });
       elements.push(node);
       if (prev_node) {
         link = new joint.shapes.html.Link({
           source: {
             id: prev_node.id,
-            port: 'out1'
+            port: 'out:locals'
           },
           target: {
             id: node.id,
-            port: 'in1'
+            port: 'in:locals'
           }
         });
         links.push(link);
@@ -70,17 +80,6 @@ init_jointjs = function(obj) {
       setting_start_y += setting_increment_y;
     }
   }
-
-  /*
-  l2 = new joint.shapes.html.Link({
-      source:
-          id: el1.id
-          port: 'out1'
-      target:
-          id: el2.id
-          port: 'in1'
-  })
-   */
   return graph.addCells(slice.call(elements).concat(slice.call(links)));
 };
 

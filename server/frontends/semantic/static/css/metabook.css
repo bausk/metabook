@@ -203,7 +203,7 @@ th.node_head {
 }
 
 th.node_head:hover {
-  background: #e3e3e3!important;
+  background: rgb(231, 228, 255)!important;
 }
 
 .node_head .head_content {
@@ -216,10 +216,76 @@ th.node_head:hover {
   right: 3px;
 }
 
+.node_empty {
+  min-width: 30px;
+  max-width: 80px;
+  min-height: 0px;
+  height: auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.node_in {
+  min-width: 30px;
+  max-width: 80px;
+  height: 38px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.node_out {
+  min-width: 30px;
+  max-width: 80px;
+  height: 38px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+
 .node_content {
   min-width:200px;
 }
 
 .node_content .content {
 
+}
+
+.ui[class*="very compact"].table td {
+  padding: 0.3em 0.3em;
+  padding-top: 0em;
+  padding-bottom: 0em;
+}
+
+tr[data-metabook] th.node_head {
+  padding-top: 0em;
+  padding-bottom: 0em;
+  height: 39px;
+}
+
+
+.node_viewer {
+  font-family: monospace!important;
+  white-space: pre!important;
+  overflow-x: auto;
+}
+
+.ui.form .node_coupled {
+  font-family: monospace;
+  padding: 0.3em 0.3em;
+  white-space: pre;
+  overflow-x: auto;
+  word-wrap: normal;
+  width: auto;
+}
+
+
+td.node_content:hover {
+  background: rgb(231, 228, 255) !important;
+}
+
+td .invisible {
+  display: none;
 }

@@ -9,8 +9,8 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
 
             type: 'html.Node'
             size: { width: 350, height: 100 }
-            inPorts: ['in1']
-            outPorts: ['out1']
+            inPorts: ['In[0]']
+            outPorts: ['Out[0]']
 
             attrs:
 
@@ -41,10 +41,14 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
                 '.inPorts .port-body': fill: '#333333'
                 '.outPorts .port-body': fill: '#666666'
 
-            metabook:
-                head_content: 'Cell: ID'
-                content: 'Click to edit code'
-                footing_content: 'Version A4D3E453'
+            head_content: 'Cell: ID'
+            content: 'Click to edit code'
+            footing_content: 'Version A4D3E453'
+            node_markup:
+                    head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>'
+                    node_viewer: '<div class="node_viewer"></div>'
+                    node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
+                    footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
 
         }, joint.shapes.basic.Generic.prototype.defaults),
         getPortAttrs: (portName, index, total, selector, type) ->
@@ -67,47 +71,40 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
     )
 )
 
-
-joint.shapes.html.Atomic = joint.shapes.html.Node.extend(defaults: joint.util.deepSupplement({
-    type: 'html.Atomic'
-    size:
-        width: 80
-        height: 80
-    attrs:
-        '.body': fill: 'salmon'
-        '.label': text: 'Atomic'
-        '.inPorts .port-body': fill: '#333333'
-        '.outPorts .port-body': fill: '#666666'
-}, joint.shapes.html.Node::defaults))
-
-
 joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface,
     template: [
-        '<div style="position:absolute">'
-        '<table class="ui very compact celled table">'
-        '<thead><tr><th colspan="3" class="node_head"><span class="head_content">Code Cell: FGFDG3456FGDFE</span><label class="ui very small label btn_close"><span class="fa fa-close"></span></label></th></tr></thead>'
-        '<tr><td class="node_in">In1</td>'
-        '<td class="node_content" rowspan="2"><span class="content" style="font-family: monospace"></span></td>'
-        '<td class="node_out">Out1</td></tr>'
-        '<tr><td class="node_in">InPort</td>'
-        '<td class="node_out">OutPort</td></tr>'
-        '<tfoot><tr><th colspan="3" class="node_footing"><span class="ui small label footing_content" style="font-family: monospace">Python file</span></th></tr></tfoot>'
+        # Template definition.
+        # <TD> structure is permanent. node_X table parts can be populated during initialize() with arbitrary content
+        '<div style="position:absolute" class="node_container">'
+        '<table class="ui very compact celled table node_table">'
+        '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>'
+        '<tbody><tr class="content_row"><td class="node_empty"></td>'
+        '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>'
+        '<td class="node_empty"></td></tr></tbody>'
+        '<tfoot><tr><th colspan="3" class="node_footing"><%= footing %></th></tr></tfoot>'
         '</table>'
         '</div>'
     ].join('')
+
+    content: {}
 
     initialize: ->
         #_.bindAll is prolly not needed
         #_.bindAll(this, 'updateBox')
         joint.dia.ElementView.prototype.initialize.apply(this, arguments)
         @isdraggable = false
+        @isedited = false
+        @isrendered = false
         @dragpoint = {x: 0, y:0, paper_x:0, paper_y:0, client_x:0, client_y:0, offset_x:0, offset_y:0}
-        #alert @model
 
-        # TODO
-        # Working on something
+        @$box = $(_.template(@template)(@model.get('node_markup')))
 
-        @$box = $(_.template(this.template)())
+        # hide node editor
+        @$box.find('.node_editor').addClass('invisible')
+
+        # dimensioning
+        @$box.find('.node_viewer').css(@model.get('dimensions'))
+
         #// Prevent paper from handling pointerdown.
         @$box.find('th.node_head').on 'mousedown', _.bind(((evt) ->
             evt = evt.originalEvent
@@ -169,19 +166,30 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         #// Remove the box when the model gets removed from the graph.
         @model.on('remove', @removeBox, this)
 
+
+
         #Why do we need updatebox here?
         #@updateBox()
         custom_shapes.push(this)
 
+        @$box.find('.node_content').on('click', _.bind(@startEditInPlace, this))
+
+        @model.on 'change:inPorts change:outPorts', _.bind(@render, this)
 
         #this.listenTo(@model, 'process:ports', @update)
         ##joint.dia.ElementView.prototype.initialize.apply(this, arguments)
 
 
     render: ->
+        @processPorts()
         joint.dia.ElementView.prototype.render.apply(this, arguments)
-        @paper.$el.prepend(@$box)
+        @paper.$el.prepend(@$box) if @isrendered is false
         @updateBox()
+        @isrendered = true
+        # TODO: After render, reformat columns to accomodate ports correctly
+        # TODO: establish event listeners for model->change:in/outPorts
+
+
         return this
 
     ###    update: ->
@@ -206,6 +214,101 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
             )
     ###
 
+    processPorts: ->
+        # 1) find and save filler cells .node_empty in the bottom row
+        # 2) remove all rows except first
+        # 3) with one row remaining, populate two edge cells with data about ports and create next table row
+        # 4) the last row created in the loop is the emtpy filler
+        # 5) set correct rowspan of the central element, .node_content
+
+        $filler_cells = @$box.find('td.node_empty').clone()
+        @$box.find('tbody tr').not(':first').remove()
+        pairs = _.zip(@model.get('inPorts'), @model.get('outPorts'))
+        rows = 1
+        _.each(pairs, _.bind(
+            (pair) ->
+                @$box.find('tbody tr:last td').first().replaceWith("<td class='node_in'>#{pair[0] ? ""}</td>")
+                @$box.find('tbody tr:last td').last().replaceWith("<td class='node_out'>#{pair[1] ? ""}</td>")
+                @$box.find('tbody tr:last').after('<tr><td class="node_empty"></td><td class="node_empty"></td></tr>')
+                rows++
+        , this)
+        )
+        @$box.find('.node_content').attr('rowspan', rows)
+
+
+    startEditInPlace: ->
+        @$box.find('.node_viewer').addClass('invisible')
+        @$box.find('.node_coupled').css('width', parseInt(@$box.find('.node_viewer').css('width')) + 6)
+        @$box.find('.node_coupled').css('height', parseInt(@$box.find('.node_viewer').css('height')) + 6)
+        @$box.find('.node_editor').removeClass('invisible').find('.node_coupled').focus()
+        @isedited = true
+        @$box.find('.node_editor').on('mousemove', (evt) ->
+            evt.stopPropagation()
+        )
+
+        @$box.find('.node_coupled').on('keydown', _.bind( ((evt) ->
+            if evt.keyCode is 27
+                @isedited = false
+                @$box.find('.node_coupled').blur()
+                # escape
+            if evt.keyCode is 13 and evt.ctrlKey is true
+                @$box.find('.node_coupled').blur()
+
+
+            ), this)
+        )
+
+
+        # Automatic resizing
+        # solution more or less taken from http://jsfiddle.net/buM6M/228/
+        @$box.find('.node_coupled').on('keyup', _.bind( ((evt) ->
+            textarea = @$box.find('.node_coupled')
+            view = @$box.find('.node_viewer')
+            newcontent = textarea.val()
+            view.html(newcontent)
+            textarea.css('width', parseInt(view.css('width')) + 6)
+            textarea.css('height', parseInt(view.css('height')) + 6)
+            ), this)
+        )
+
+
+        @$box.find('.node_coupled').on('mousewheel', _.bind(((evt) ->
+            evt.stopPropagation()
+            ), this)
+        )
+
+        @$box.find('.node_coupled').on('blur', _.bind( ((evt) ->
+            textarea = @$box.find('.node_coupled')
+            view = @$box.find('.node_viewer')
+            newcontent = textarea.val()
+            if @isedited is true
+                @model.set('content', newcontent)
+                view.html(newcontent)
+
+            @isedited = false
+
+
+
+
+            @$box.find('.node_editor').addClass('invisible')
+            @$box.find('.node_viewer').removeClass('invisible')
+
+
+            @updateBox()
+            ), this)
+        )
+
+        #@$box.find('.node_editor').on('click', (evt) ->
+        #    evt.stopPropagation()
+
+        #)
+        #@$box.find('.content_node').focusout( _.bind(( ->
+        #    @$box.find('.content_node').replaceWith(@model.get('metabook').markup.node
+        #    )), this)
+        #)
+
+
+
     updateBox: ->
         #// Set the position and dimension of the box so that it covers the JointJS element.
         bbox = @model.getBBox()
@@ -219,10 +322,19 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         #// Example of updating the HTML with a data stored in the cell model.
         @$box.find('label').text(@model.get('label'))
         @$box.find('span').text(@model.get('select'))
-        @$box.find('.content').html(@model.get('metabook').content)
-        @$box.find('.footing_content').html(@model.get('metabook').footing_content)
+        @$box.find('.node_viewer').html(@model.get('content'))
+        if @isedited is false
+            @$box.find('.node_coupled').val(@model.get('content'))
+        @$box.find('.content_footing').html(@model.get('footing_content'))
         @$box.css('transform-origin', 'left top')
-        @$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (@model.get('angle') || 0) + 'deg) scale(' + scale + ')'})
+        # TODO: invert update to make model dependent on @$box size
+        @$box.css({ left: bbox.x, top: bbox.y, transform: 'rotate(' + (@model.get('angle') || 0) + 'deg) scale(' + scale + ')'})
+        @model.set('size',
+            width: parseInt(@$box.css('width'))
+            height: parseInt(@$box.css('height'))
+        )
+        hljs.highlightBlock(@$box.find('.node_viewer')[0])
+        # @$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (@model.get('angle') || 0) + 'deg) scale(' + scale + ')'})
 
     removeBox: (evt) ->
         @$box.remove()

@@ -38,9 +38,9 @@ GraphPaper = joint.dia.Paper.extend(
 
         #Enable pan when a /blank/ not blank, any area is click (held) on
         @$el.on('mousedown', _.bind(((evt, x, y) ->
-            evt.preventDefault()
             evt = evt.originalEvent
             return if evt.which != 2
+            evt.preventDefault()
             @dragpoint.x = evt.pageX
             @dragpoint.y = evt.pageY
             @dragpoint.offset_x = @origin.x * @current_scale
@@ -48,6 +48,7 @@ GraphPaper = joint.dia.Paper.extend(
             @draggable = true
         ), this)
         )
+
 
 
 
@@ -91,7 +92,6 @@ GraphPaper = joint.dia.Paper.extend(
                     elem.updateBox()
         ), this)
         )
-
         #end panning
         $(window).on('mouseup', (e) ->
             @draggable = false
