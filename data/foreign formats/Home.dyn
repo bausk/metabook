@@ -1,0 +1,29 @@
+<Workspace Version="0.9.0.3067" X="-177.623062832363" Y="103.583327899321" zoom="1.07925372895183" Name="Home" Description="" RunType="Automatic" RunPeriod="1000" HasRunWithoutCrash="True">
+  <NamespaceResolutionMap />
+  <Elements>
+    <Dynamo.Nodes.DSFunction guid="1f3351f9-12c5-4ea6-9a77-3d5e998d4492" type="Dynamo.Nodes.DSFunction" nickname="DateTime.MinValue" x="341.700801677065" y="303.277485467678" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" assembly="DSCoreNodes.dll" function="DSCore.DateTime.MinValue" />
+    <Dynamo.Nodes.DSFunction guid="f5f851d2-2287-48eb-8cfc-024d8f2d432c" type="Dynamo.Nodes.DSFunction" nickname="DateTime.Today" x="353.5" y="161.5" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" assembly="DSCoreNodes.dll" function="DSCore.DateTime.Today" />
+    <Dynamo.Nodes.DSFunction guid="2c558820-7b88-4e25-8395-6fb9d1e3ced5" type="Dynamo.Nodes.DSFunction" nickname="DateTime.DaysInMonthwerwerwerwerwerwerwer" x="808.664154386828" y="243.003249966086" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" assembly="DSCoreNodes.dll" function="DSCore.DateTime.DaysInMonth@int,int" />
+    <PythonNodeModels.PythonNode guid="cff2505c-8e31-4444-9db8-afff9f64e864" type="PythonNodeModels.PythonNode" nickname="Python Script" x="597.818355989181" y="416.020150925541" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" inputcount="2">
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#Введенные в этом узле данные сохраняется в виде списка в переменных IN.
+dataEnteringNode = IN
+
+#Назначьте вывод переменной OUT.
+OUT = 0</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Nodes.CodeBlockNodeModel guid="51b17d51-692f-4fc8-9a69-903ddfdde4ef" type="Dynamo.Nodes.CodeBlockNodeModel" nickname="Code Block" x="631.174738306213" y="76.8969307023812" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" CodeText="nigger code;&#xA;dedfrefwfewfewfwefwefwefwefwefwefwef;" ShouldFocus="false" />
+  </Elements>
+  <Connectors>
+    <Dynamo.Models.ConnectorModel start="1f3351f9-12c5-4ea6-9a77-3d5e998d4492" start_index="0" end="2c558820-7b88-4e25-8395-6fb9d1e3ced5" end_index="1" portType="0" />
+    <Dynamo.Models.ConnectorModel start="f5f851d2-2287-48eb-8cfc-024d8f2d432c" start_index="0" end="2c558820-7b88-4e25-8395-6fb9d1e3ced5" end_index="0" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Фоновый просмотр" eyeX="-4.23401737213135" eyeY="29.5152683258057" eyeZ="46.1364288330078" lookX="-0.765982866287231" lookY="-18.5152683258057" lookZ="-54.1364288330078" upX="-0.00160156562924385" upY="0.993571877479553" upZ="-0.11319188028574" />
+  </Cameras>
+</Workspace>

@@ -1,0 +1,28 @@
+<Workspace Version="0.9.0.3067" X="-552.272198161279" Y="-331.867083128087" zoom="2.04578512883178" Name="Котина" Description="Скотина" ID="72a92f98-f7bc-4ab7-b3f3-4bc76ba4dcfd" Category="BuiltIn">
+  <NamespaceResolutionMap />
+  <Elements>
+    <PythonNodeModels.PythonNode guid="2cb2576e-5570-4117-80d8-12735c3c38ba" type="PythonNodeModels.PythonNode" nickname="Python Script" x="493.5" y="371" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" inputcount="2">
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#Введенные в этом узле данные сохраняется в виде списка в переменных IN.
+dataEnteringNode = IN
+
+#Назначьте вывод переменной OUT.
+OUT = 0
+huihuihu</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Nodes.DSFunction guid="0ff4977a-fff9-43b7-837d-ba9b0e49a591" type="Dynamo.Nodes.DSFunction" nickname="DateTime.ByDate" x="686.872568127678" y="351.839770511937" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" assembly="DSCoreNodes.dll" function="DSCore.DateTime.ByDate@int,int,int" />
+  </Elements>
+  <Connectors>
+    <Dynamo.Models.ConnectorModel start="2cb2576e-5570-4117-80d8-12735c3c38ba" start_index="0" end="0ff4977a-fff9-43b7-837d-ba9b0e49a591" end_index="0" portType="0" />
+    <Dynamo.Models.ConnectorModel start="2cb2576e-5570-4117-80d8-12735c3c38ba" start_index="0" end="0ff4977a-fff9-43b7-837d-ba9b0e49a591" end_index="1" portType="0" />
+    <Dynamo.Models.ConnectorModel start="2cb2576e-5570-4117-80d8-12735c3c38ba" start_index="0" end="0ff4977a-fff9-43b7-837d-ba9b0e49a591" end_index="2" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Фоновый просмотр" eyeX="-4.23401737213135" eyeY="29.5152683258057" eyeZ="46.1364288330078" lookX="-0.765982866287231" lookY="-18.5152683258057" lookZ="-54.1364288330078" upX="-0.00160156562924385" upY="0.993571877479553" upZ="-0.11319188028574" />
+  </Cameras>
+</Workspace>

@@ -75,7 +75,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     template: [
         # Template definition.
         # <TD> structure is permanent. node_X table parts can be populated during initialize() with arbitrary content
-        '<div style="position:absolute" class="node_container">'
+        '<div style="position:absolute" class="node_container selection-box">'
         '<table class="ui very compact celled table node_table">'
         '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>'
         '<tbody><tr class="content_row"><td class="node_empty"></td>'
@@ -174,7 +174,9 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
 
         @$box.find('.node_content').on('click', _.bind(@startEditInPlace, this))
 
-        @model.on 'change:inPorts change:outPorts', _.bind(@render, this)
+        #@model.on('change', @render, this)
+        #@model.on 'change', _.bind(@render, this)
+
 
         #this.listenTo(@model, 'process:ports', @update)
         ##joint.dia.ElementView.prototype.initialize.apply(this, arguments)
@@ -185,6 +187,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         joint.dia.ElementView.prototype.render.apply(this, arguments)
         @paper.$el.prepend(@$box) if @isrendered is false
         @updateBox()
+
         @isrendered = true
         # TODO: After render, reformat columns to accomodate ports correctly
         # TODO: establish event listeners for model->change:in/outPorts
@@ -234,6 +237,19 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         , this)
         )
         @$box.find('.node_content').attr('rowspan', rows)
+        @$box.find('.node_empty').on('click', _.bind(((evt) ->
+
+            if $(evt.target).is(':last-child')
+                portsname = 'outPorts'
+            else
+                portsname = 'inPorts'
+            ports = @model.get(portsname)
+            ports.push('newport' + Math.random().toPrecision(2))
+            @model.set(portsname, ports)
+            @model.updatePortsAttrs()
+            @render()
+        ), this))
+
 
 
     startEditInPlace: ->

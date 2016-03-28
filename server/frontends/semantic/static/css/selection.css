@@ -1,0 +1,27 @@
+
+.selection {
+    position: absolute;
+    background-color: #3498DB;
+    opacity: .3;
+    border: 2px solid #2980B9;
+    overflow: visible;
+}
+
+.selection.selected {
+    background-color: transparent;
+    border: none;
+    opacity: 1;
+    cursor: move;
+    position: static;
+    height: 0 !important;
+}
+
+.selection-box {
+    /* position: absolute; */
+    border: none;
+
+    -webkit-box-shadow: 0px 0px 3px 3px rgba(27,130,168,0.68);
+    -moz-box-shadow: 0px 0px 3px 3px rgba(27,130,168,0.68);
+    box-shadow: 0px 0px 3px 3px rgba(27,130,168,0.68);
+}
+

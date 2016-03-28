@@ -108,7 +108,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
 }));
 
 joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface, {
-  template: ['<div style="position:absolute" class="node_container">', '<table class="ui very compact celled table node_table">', '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>', '<tbody><tr class="content_row"><td class="node_empty"></td>', '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>', '<td class="node_empty"></td></tr></tbody>', '<tfoot><tr><th colspan="3" class="node_footing"><%= footing %></th></tr></tfoot>', '</table>', '</div>'].join(''),
+  template: ['<div style="position:absolute" class="node_container selection-box">', '<table class="ui very compact celled table node_table">', '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>', '<tbody><tr class="content_row"><td class="node_empty"></td>', '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>', '<td class="node_empty"></td></tr></tbody>', '<tfoot><tr><th colspan="3" class="node_footing"><%= footing %></th></tr></tfoot>', '</table>', '</div>'].join(''),
   content: {},
   initialize: function() {
     joint.dia.ElementView.prototype.initialize.apply(this, arguments);
@@ -184,8 +184,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     this.model.on('change', this.updateBox, this);
     this.model.on('remove', this.removeBox, this);
     custom_shapes.push(this);
-    this.$box.find('.node_content').on('click', _.bind(this.startEditInPlace, this));
-    return this.model.on('change:inPorts change:outPorts', _.bind(this.render, this));
+    return this.$box.find('.node_content').on('click', _.bind(this.startEditInPlace, this));
   },
   render: function() {
     this.processPorts();
@@ -232,7 +231,20 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
       this.$box.find('tbody tr:last').after('<tr><td class="node_empty"></td><td class="node_empty"></td></tr>');
       return rows++;
     }, this));
-    return this.$box.find('.node_content').attr('rowspan', rows);
+    this.$box.find('.node_content').attr('rowspan', rows);
+    return this.$box.find('.node_empty').on('click', _.bind((function(evt) {
+      var ports, portsname;
+      if ($(evt.target).is(':last-child')) {
+        portsname = 'outPorts';
+      } else {
+        portsname = 'inPorts';
+      }
+      ports = this.model.get(portsname);
+      ports.push('newport' + Math.random().toPrecision(2));
+      this.model.set(portsname, ports);
+      this.model.updatePortsAttrs();
+      return this.render();
+    }), this));
   },
   startEditInPlace: function() {
     this.$box.find('.node_viewer').addClass('invisible');
