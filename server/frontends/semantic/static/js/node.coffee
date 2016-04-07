@@ -1,6 +1,14 @@
 
 joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
-    {},
+    {
+        initialize: (attrs, data) ->
+            joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments)
+            _.each(data.cell_model, _.bind( ((value, key) ->
+                @set(key, value)
+                ), this)
+            )
+            @cell_model = data.cell_model
+    },
     joint.shapes.basic.PortsModelInterface,
         markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
         portMarkup: '<g class="port port<%= id %>"><circle class="port-body"/></g>',
@@ -51,6 +59,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
                     footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
 
         }, joint.shapes.basic.Generic.prototype.defaults),
+
         getPortAttrs: (portName, index, total, selector, type) ->
 
             attrs = {}
@@ -177,9 +186,13 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         #@model.on('change', @render, this)
         #@model.on 'change', _.bind(@render, this)
 
+        # TODO: Bind handler for Extended node edition and settings
+
+
+        # TODO: Bind handler for model update -> server
+
 
         #this.listenTo(@model, 'process:ports', @update)
-        ##joint.dia.ElementView.prototype.initialize.apply(this, arguments)
 
 
     render: ->
@@ -224,7 +237,6 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         # 4) the last row created in the loop is the emtpy filler
         # 5) set correct rowspan of the central element, .node_content
 
-        $filler_cells = @$box.find('td.node_empty').clone()
         @$box.find('tbody tr').not(':first').remove()
         pairs = _.zip(@model.get('inPorts'), @model.get('outPorts'))
         rows = 1
@@ -249,7 +261,6 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
             @model.updatePortsAttrs()
             @render()
         ), this))
-
 
 
     startEditInPlace: ->
@@ -324,18 +335,16 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         #)
 
 
-
     updateBox: ->
+
+        # TODO: disentangle resizing from other updates
         #// Set the position and dimension of the box so that it covers the JointJS element.
         bbox = @model.getBBox()
         {x, y} = @paper.getRealCoords(bbox.x, bbox.y)
         bbox.x = x
         bbox.y = y
         scale = @paper.current_scale
-        #bbox.width = bbox.width * paper.getScale()
-        #bbox.height = bbox.height * paper.getScale()
-        $(Settings.id.messages).text(bbox.x + "//" + bbox.y)
-        #// Example of updating the HTML with a data stored in the cell model.
+
         @$box.find('label').text(@model.get('label'))
         @$box.find('span').text(@model.get('select'))
         @$box.find('.node_viewer').html(@model.get('content'))
@@ -343,7 +352,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
             @$box.find('.node_coupled').val(@model.get('content'))
         @$box.find('.content_footing').html(@model.get('footing_content'))
         @$box.css('transform-origin', 'left top')
-        # TODO: invert update to make model dependent on @$box size
+
         @$box.css({ left: bbox.x, top: bbox.y, transform: 'rotate(' + (@model.get('angle') || 0) + 'deg) scale(' + scale + ')'})
 
         # compute height by collecting thead+tbody height minus last tr

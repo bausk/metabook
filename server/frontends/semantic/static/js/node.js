@@ -2,7 +2,15 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.shapes.basic.PortsModelInterface, {
+joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({
+  initialize: function(attrs, data) {
+    joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
+    _.each(data.cell_model, _.bind((function(value, key) {
+      return this.set(key, value);
+    }), this));
+    return this.cell_model = data.cell_model;
+  }
+}, joint.shapes.basic.PortsModelInterface, {
   markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
   portMarkup: '<g class="port port<%= id %>"><circle class="port-body"/></g>',
   defaults: joint.util.deepSupplement({
@@ -219,8 +227,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
           )
    */
   processPorts: function() {
-    var $filler_cells, pairs, rows;
-    $filler_cells = this.$box.find('td.node_empty').clone();
+    var pairs, rows;
     this.$box.find('tbody tr').not(':first').remove();
     pairs = _.zip(this.model.get('inPorts'), this.model.get('outPorts'));
     rows = 1;
@@ -298,7 +305,6 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     bbox.x = x;
     bbox.y = y;
     scale = this.paper.current_scale;
-    $(Settings.id.messages).text(bbox.x + "//" + bbox.y);
     this.$box.find('label').text(this.model.get('label'));
     this.$box.find('span').text(this.model.get('select'));
     this.$box.find('.node_viewer').html(this.model.get('content'));
