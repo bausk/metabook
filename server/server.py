@@ -41,14 +41,17 @@ class Application(tornado.web.Application):
             (r"/" + metabook_config.routes.graph + r"/(.*)", metabook.routes.GraphHandler),
             (r"/" + metabook_config.routes.graph + r"/\?new", metabook.routes.GraphHandler),
             (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.file.FileHandler),
-            (r"/" + metabook_config.routes.api.session + r"/(.*)", metabook.api.sessions.SessionHandler)
+            (r"/" + metabook_config.routes.api.template + r"/(.*)", metabook.api.file.TemplateHandler),
+            (r"/" + metabook_config.routes.api.solvers + r"/(.*)", metabook.api.file.SolverHandler),
+            (r"/" + metabook_config.routes.api.sessions + r"/(.*)", metabook.api.sessions.SessionHandler)
 
         ]
+
         settings = dict(
             cookie_secret="__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
             template_path=os.path.join(os.path.dirname(__file__), options.templates),
             static_path=os.path.join(os.path.dirname(__file__), options.static),
-            xsrf_cookies=True,
+            xsrf_cookies=False,
         )
         super(Application, self).__init__(handlers, debug=True, **settings)
         # TODO: Remove debug=True in production

@@ -3,9 +3,11 @@
 {% block body %}
 <body style="overflow: hidden">
 
+
+
 <div class="ui top inverted menu">
         <a class="item" id="uiMenuToggle"><i class="fa fa-list"></i>&nbsp;Menu</a>
-        <a class="item" href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-home"></span>&nbsp;Home</a>
+        <a class="item" data-action="notebook.save"><span class="fa fa-save"></span>&nbsp;Save</a>
         <a class="item" href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span>&nbsp;To folder</a>
         <a class="item" href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span>&nbsp;Manage server</a>
         <div class="item"><h3>{{lpath}}</h3></div>
@@ -49,11 +51,7 @@
 
         <div id="messages" class="ui info message"></div>
         <div id="coords" class="ui info message"></div>
-
     </div>
-
-
-
     </div>
 
 

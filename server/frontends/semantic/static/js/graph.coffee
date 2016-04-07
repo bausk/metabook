@@ -1,21 +1,13 @@
-func_add = (e) ->
-    alert("add")
-
-func_edit = (e) ->
-    alert("edit")
-
-func_delete = (e) ->
-    alert("delete" + e.pageX)
-
 Settings =
     active_menu_class: "context-menu--active"
     context_menu:
         ".element": "#context-menu"
         "svg": "#context-menu2"
-    ui_actions:
-        "Add": func_add
-        "Edit": func_edit
-        "Delete": func_delete
+    ui:
+        actions:
+            "Add": metabook.ui.add
+            "Edit": metabook.ui.edit
+            "Delete": metabook.ui.delete
     id:
         messages: "#messages"
         coords: "#coords"
@@ -75,23 +67,36 @@ $(document).ready ->
     # dim the screen while fetching file data
     $("#id2").dimmer({closable:false}).dimmer('show')
 
+    metabook.api.get_template(init_graph, error_graph)
 
-    # if file is new, generate ID I guess...
-    # TODO
-    if metabook.file_id == ""
-        init_graph( {} )
+
+init_graph = (graph_template) ->
+
+    if metabook.api.file_id != ""
+        metabook.api.get_file(_.partial(parse_graph, graph_template), error_graph)
     else
-        $.ajax(
-            url: metabook.file_api_endpoint + metabook.path
-            type: 'GET'
-            success: init_graph
-            error: error_graph
-        )
+        # File is new because there is no id
+        # TODO: if file is new, generate ID I guess...
+        parse_graph(graph_template, {})
 
-init_graph = (graph_json) ->
-    $("#el_file_contents").text(graph_json)
-    source_obj = graph_json
-    init_jointjs(source_obj)
+parse_graph = (graph_template, graph_json) ->
+    # TODO: build MetabookModel with submodels and bind them to jointjs models
+
+    if Object.keys(graph_json).length == 0
+        graph_json = graph_template
+    else if not 'metabook' of graph_json.metadata
+        graph_json.metadata.metabook = graph_template.metadata.metabook
+        graph_json.metadata.metabook.id = joint.util.uuid()
+
+
+    # TODO: if no metabook metadata, populate from template and generate id
+
+
+    cells_collection = init_jointjs(graph_template, graph_json)
+
+    notebook = new metabook.models.MetabookModel({'cells': cells_collection}, {template: graph_template, json: graph_json})
+
+
 
     $("#id2").dimmer('hide')
 
@@ -108,10 +113,16 @@ init_graph = (graph_json) ->
     bind_ui_actions(Settings)
     jointjs_attach_events(Obj.mainpaper, Obj.graph)
 
+
+    menuview = new metabook.views.MenuView(
+        el: $ ".menu"
+        model: notebook
+    )
+
 bind_ui_actions = (settings) ->
     $("[data-action]").on('click', (e) ->
         action = e.target.dataset.action
-        actions = settings.ui_actions
+        actions = Settings.ui.actions
         if `action in actions`
             ContextMenu.active_menu_off()
             actions[action].apply(this, arguments)
@@ -119,4 +130,4 @@ bind_ui_actions = (settings) ->
 
 error_graph = (e) ->
     $("#id2").dimmer('hide')
-    alert("fuck u mimsy")
+    alert("Connection error. Check if your backend is running.")

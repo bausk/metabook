@@ -107,4 +107,28 @@ ContextMenu = {
   }
 };
 
+metabook.ui.add = function(e) {
+  return alert("add");
+};
+
+metabook.ui.edit = function(e) {
+  return alert("edit");
+};
+
+metabook.ui["delete"] = function(e) {
+  return alert("delete" + e.pageX);
+};
+
+metabook.ui.save = function(e) {
+  return alert('save');
+};
+
+$("[data-action]").click(function(evt) {
+  var action;
+  action = $(this).data('action');
+  if (Settings.ui.actions.hasOwnProperty(action)) {
+    return Settings.ui.actions[action](evt);
+  }
+});
+
 //# sourceMappingURL=ui.js.map

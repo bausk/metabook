@@ -2,7 +2,7 @@ import tornado.web
 import tornado.gen
 import os
 from tornado.options import options
-from .local.filepaths import request_path, host_info, local_path
+from .local.files import request_path, host_info, local_path
 import json
 
 from metabook.config import metabook_config

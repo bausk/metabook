@@ -1,0 +1,66 @@
+<Workspace Version="0.8.2.2392" X="350.604523969848" Y="-631.819366434986" zoom="1.22874790606483" Name="Home" Description="" RunType="Manual" RunPeriod="1000" HasRunWithoutCrash="True">
+  <NamespaceResolutionMap>
+    <ClassMap partialName="Material" resolvedName="Revit.Elements.Material" assemblyName="RevitNodes.dll" />
+    <ClassMap partialName="Element" resolvedName="Revit.Elements.Element" assemblyName="RevitNodes.dll" />
+  </NamespaceResolutionMap>
+  <Elements>
+    <DSIronPythonNode.PythonNode guid="40a3af98-f4a8-4088-946e-11f55c69a8aa" type="DSIronPythonNode.PythonNode" nickname="PyS Get Density by wall " x="29.4287534836076" y="684.567310319495" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" inputcount="2">
+      <Script>import clr
+clr.AddReference("RevitAPI")
+import Autodesk
+from Autodesk.Revit.DB import *
+from System.Collections.Generic import *
+
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+
+clr.AddReference("RevitNodes")
+import Revit
+clr.ImportExtensions(Revit.Elements)
+
+clr.ImportExtensions(Revit.GeometryConversion)
+
+clr.AddReference("RevitServices")
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+from System.Collections.Generic import *
+
+doc = DocumentManager.Instance.CurrentDBDocument
+
+wall=UnwrapElement(IN[0])
+density=[]
+# количество слоев в стенке (count layers in wall)
+num = wall.WallType.GetCompoundStructure().LayerCount
+# перебор каждого слоя для получения свойства каждого слоя
+for counter in range(num):
+	# толщина слоя (width each layer)
+	layerwidth=wall.WallType.GetCompoundStructure().GetLayerWidth(counter)*304.8/1000
+	# материал слоя (material each layer)
+	mat = doc.GetElement(wall.WallType.GetCompoundStructure().GetMaterialId(counter))
+	# получение набора свойств каждого материала
+	matid=mat.StructuralAssetId
+	# плотность каждого материала из его набора свойств
+	density.append(doc.GetElement(matid).GetStructuralAsset().Density*35.314666666666)
+	
+OUT= density
+</Script>
+    </DSIronPythonNode.PythonNode>
+    <DSCoreNodesUI.BoolSelector guid="acd61b63-f06f-440c-ac90-9a8eaaa3575e" type="DSCoreNodesUI.BoolSelector" nickname="restart" x="-183.499050113247" y="771.037790351332" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True">
+      <System.Boolean>True</System.Boolean>
+    </DSCoreNodesUI.BoolSelector>
+    <Dynamo.Nodes.DSModelElementSelection guid="5a78cb9c-7fe4-47aa-844e-876e5f131d49" type="Dynamo.Nodes.DSModelElementSelection" nickname="Select Model Element" x="-234.411947800297" y="640.423467562769" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True">
+      <instance id="ad93e105-788d-44bd-be79-eca742d2f241-000339f3" />
+    </Dynamo.Nodes.DSModelElementSelection>
+  </Elements>
+  <Connectors>
+    <Dynamo.Models.ConnectorModel start="acd61b63-f06f-440c-ac90-9a8eaaa3575e" start_index="0" end="40a3af98-f4a8-4088-946e-11f55c69a8aa" end_index="1" portType="0" />
+    <Dynamo.Models.ConnectorModel start="5a78cb9c-7fe4-47aa-844e-876e5f131d49" start_index="0" end="40a3af98-f4a8-4088-946e-11f55c69a8aa" end_index="0" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="background_preview" eyeX="10" eyeY="15" eyeZ="10" lookX="-10" lookY="-10" lookZ="-10" />
+  </Cameras>
+</Workspace>

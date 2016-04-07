@@ -6,8 +6,8 @@ graphics = {};
 
 custom_shapes = [];
 
-init_jointjs = function(obj) {
-  var cells, code_cells, elements, graph, i, len, link, links, node, paper, paper_holder, prev_node, pycell, setting_increment_x, setting_increment_y, setting_start_x, setting_start_y;
+init_jointjs = function(graph_template, graph_json) {
+  var cell_collection, cell_model, code_cells, elements, graph, i, len, link, links, node, paper_holder, prev_node, pycell, setting_increment_x, setting_increment_y, setting_start_x, setting_start_y;
   paper_holder = $(Settings.id.graph_container);
   Obj.graph = new joint.dia.Graph();
   Obj.mainpaper = new GraphPaper({
@@ -18,69 +18,64 @@ init_jointjs = function(obj) {
     gridSize: 1,
     defaultLink: new joint.shapes.html.Link
   });
-  paper = Obj.mainpaper;
   graph = Obj.graph;
-  cells = obj.cells;
   setting_start_x = 30;
   setting_start_y = 30;
   setting_increment_x = 500;
   setting_increment_y = 100;
   elements = [];
   links = [];
-  if (metabook.file_id === "") {
-    elements.push(new joint.shapes.html.Node({
+  prev_node = void 0;
+  code_cells = _.filter(graph_json.cells, function(o) {
+    return o['cell_type'] === "code";
+  });
+  cell_collection = new metabook.models.CellCollection();
+  for (i = 0, len = code_cells.length; i < len; i++) {
+    pycell = code_cells[i];
+    cell_model = new metabook.models.CellModel(pycell, pycell);
+    cell_collection.add(cell_model);
+    node = new joint.shapes.html.Node({
       position: {
         x: setting_start_x,
         y: setting_start_y
-      }
-    }));
-  } else {
-    prev_node = void 0;
-    code_cells = _.filter(obj.cells, function(o) {
-      return o['cell_type'] === "code";
+      },
+      content: pycell.source.join(""),
+      footing_content: "ipynb cell [" + pycell.execution_count + "]",
+      node_markup: {
+        node_viewer: '<div class="node_viewer python" data-metabook="true"></div>',
+        node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
+      },
+      dimensions: {
+        'min-height': 100,
+        'max-height': 200,
+        'min-width': 250,
+        'max-width': 500
+      },
+      inPorts: ['in:locals'],
+      outPorts: ['out:locals']
+    }, {
+      cell_model: cell_model
     });
-    for (i = 0, len = code_cells.length; i < len; i++) {
-      pycell = code_cells[i];
-      node = new joint.shapes.html.Node({
-        position: {
-          x: setting_start_x,
-          y: setting_start_y
+    elements.push(node);
+    if (prev_node) {
+      link = new joint.shapes.html.Link({
+        source: {
+          id: prev_node.id,
+          port: 'out:locals'
         },
-        content: pycell.source.join(""),
-        footing_content: "ipynb cell [" + pycell.execution_count + "]",
-        node_markup: {
-          node_viewer: '<div class="node_viewer python" data-metabook="true"></div>',
-          node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
-        },
-        dimensions: {
-          'min-height': 100,
-          'max-height': 200,
-          'min-width': 250,
-          'max-width': 500
-        },
-        inPorts: ['in:locals'],
-        outPorts: ['out:locals']
+        target: {
+          id: node.id,
+          port: 'in:locals'
+        }
       });
-      elements.push(node);
-      if (prev_node) {
-        link = new joint.shapes.html.Link({
-          source: {
-            id: prev_node.id,
-            port: 'out:locals'
-          },
-          target: {
-            id: node.id,
-            port: 'in:locals'
-          }
-        });
-        links.push(link);
-      }
-      prev_node = node;
-      setting_start_x += setting_increment_x;
-      setting_start_y += setting_increment_y;
+      links.push(link);
     }
+    prev_node = node;
+    setting_start_x += setting_increment_x;
+    setting_start_y += setting_increment_y;
   }
-  return graph.addCells(slice.call(elements).concat(slice.call(links)));
+  graph.addCells(slice.call(elements).concat(slice.call(links)));
+  return cell_collection;
 };
 
 jointjs_attach_events = function(paper, graph) {

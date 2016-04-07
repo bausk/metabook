@@ -105,3 +105,21 @@ ContextMenu = {
         return
 
 }
+
+metabook.ui.add = (e) ->
+    alert("add")
+
+metabook.ui.edit = (e) ->
+    alert("edit")
+
+metabook.ui.delete = (e) ->
+    alert("delete" + e.pageX)
+
+metabook.ui.save = (e) ->
+    alert('save')
+
+$("[data-action]").click( (evt) ->
+    action = $(this).data('action')
+    if Settings.ui.actions.hasOwnProperty(action)
+        Settings.ui.actions[action](evt)
+)

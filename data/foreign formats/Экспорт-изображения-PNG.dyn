@@ -42,9 +42,19 @@ if window.ShowDialog() == DialogResult.OK:
     <CoreNodeModels.Input.BoolSelector guid="630cc7b5-aebe-4d04-95c3-eb9c1506c41f" type="CoreNodeModels.Input.BoolSelector" nickname="Boolean" x="205" y="277" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false">
       <System.Boolean>True</System.Boolean>
     </CoreNodeModels.Input.BoolSelector>
+    <Dynamo.Nodes.Function guid="9fd0b976-cc30-4b66-a8c0-bcef50755159" type="Dynamo.Nodes.Function" nickname="Котина" x="180.95464362851" y="328.319654427646" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="True">
+      <ID value="72a92f98-f7bc-4ab7-b3f3-4bc76ba4dcfd" />
+      <Name value="Котина" />
+      <Description value="Скотина" />
+      <Inputs />
+      <Outputs>
+        <Output value="dateTime" />
+      </Outputs>
+    </Dynamo.Nodes.Function>
   </Elements>
   <Connectors>
     <Dynamo.Models.ConnectorModel start="630cc7b5-aebe-4d04-95c3-eb9c1506c41f" start_index="0" end="1d77411b-f816-4e64-bba9-217a8168c8c8" end_index="0" portType="0" />
+    <Dynamo.Models.ConnectorModel start="9fd0b976-cc30-4b66-a8c0-bcef50755159" start_index="0" end="1d77411b-f816-4e64-bba9-217a8168c8c8" end_index="1" portType="0" />
   </Connectors>
   <Notes />
   <Annotations />
