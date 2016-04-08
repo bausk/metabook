@@ -96,7 +96,7 @@ parse_graph = function(graph_template, graph_json) {
   var cells_collection, menuview, notebook;
   if (Object.keys(graph_json).length === 0) {
     graph_json = graph_template;
-  } else if (!'metabook' in graph_json.metadata) {
+  } else if (!('metabook' in graph_json.metadata)) {
     graph_json.metadata.metabook = graph_template.metadata.metabook;
     graph_json.metadata.metabook.id = joint.util.uuid();
   }

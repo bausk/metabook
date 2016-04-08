@@ -84,7 +84,7 @@ parse_graph = (graph_template, graph_json) ->
 
     if Object.keys(graph_json).length == 0
         graph_json = graph_template
-    else if not 'metabook' of graph_json.metadata
+    else if not('metabook' of graph_json.metadata)
         graph_json.metadata.metabook = graph_template.metadata.metabook
         graph_json.metadata.metabook.id = joint.util.uuid()
 

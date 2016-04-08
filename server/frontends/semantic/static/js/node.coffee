@@ -1,14 +1,5 @@
 
-joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
-    {
-        initialize: (attrs, data) ->
-            joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments)
-            _.each(data.cell_model, _.bind( ((value, key) ->
-                @set(key, value)
-                ), this)
-            )
-            @cell_model = data.cell_model
-    },
+joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
     joint.shapes.basic.PortsModelInterface,
         markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
         portMarkup: '<g class="port port<%= id %>"><circle class="port-body"/></g>',
@@ -60,25 +51,46 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend(
 
         }, joint.shapes.basic.Generic.prototype.defaults),
 
+        initialize: (attrs, data) ->
+            # joint.shapes.basic.GenericNode.prototype.initialize.apply(this, arguments)
+            _.each(data.cell_model, _.bind(((value, key) ->
+                @set(key, value)
+                ), this)
+            )
+            @cell_model = data.cell_model
+            @on('change', _.bind((() ->
+                    #alert('small model change!')
+                    @cell_model.update_data(@get('content'))
+                ), this)
+            )
+
+            @updatePortsAttrs()
+            @on('change:inPorts change:outPorts', @updatePortsAttrs, this)
+
+            @constructor.__super__.constructor.__super__.initialize.apply(this, arguments)
+
+
+
         getPortAttrs: (portName, index, total, selector, type) ->
+          attrs = {}
+          portClass = 'port' + index
+          portSelector = selector + '>.' + portClass
+          portLabelSelector = portSelector + '>.port-label'
+          portBodySelector = portSelector + '>.port-body'
 
-            attrs = {}
-            portClass = 'port' + index
-            portSelector = selector + '>.' + portClass
-            portLabelSelector = portSelector + '>.port-label'
-            portBodySelector = portSelector + '>.port-body'
-
-            attrs[portLabelSelector] = { text: portName }
-            attrs[portBodySelector] =
-                port:
-                    id: portName || _.uniqueId(type)
-                    type: type
-            attrs[portSelector] = { ref: '.body', 'ref-y': (39/38 + 0.5 + index) / (39/38 + total) }
-            if selector is '.outPorts'
-                attrs[portSelector]['ref-dx'] = 0
-            return attrs
+          attrs[portLabelSelector] = {text: portName}
+          attrs[portBodySelector] =
+              port:
+                  id: portName || _.uniqueId(type)
+                  type: type
+          attrs[portSelector] = {ref: '.body', 'ref-y': (39 / 38 + 0.5 + index) / (39 / 38 + total)}
+          if selector is '.outPorts'
+              attrs[portSelector]['ref-dx'] = 0
+          return attrs
     )
 )
+
+
 
 joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface,
     template: [

@@ -45,10 +45,14 @@ init_jointjs = (graph_template, graph_json) ->
         cell_model = new metabook.models.CellModel(pycell, pycell)
         cell_collection.add(cell_model)
 
-
+        content =
+        if typeof(pycell.source) != "string"
+            content = pycell.source.join("")
+        else
+            content = pycell.source
         node = new joint.shapes.html.Node(
             position: { x: setting_start_x, y: setting_start_y }
-            content: pycell.source.join("")
+            content: content
             footing_content: "ipynb cell [#{pycell.execution_count}]"
             node_markup:
                 node_viewer: '<div class="node_viewer python" data-metabook="true"></div>'

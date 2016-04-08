@@ -40,6 +40,10 @@ metabook.models.CellModel = (function(superClass) {
 
   CellModel.prototype.initialize = function(attributes, data) {};
 
+  CellModel.prototype.update_data = function(data) {
+    return this.set('source', data);
+  };
+
   return CellModel;
 
 })(Backbone.Model);
@@ -65,7 +69,7 @@ metabook.models.MetabookModel = (function(superClass) {
   }
 
   MetabookModel.prototype.initialize = function(attributes, data) {
-    if (!'metabook' in data.json.metadata) {
+    if (!('metabook' in data.json.metadata)) {
       data.json.metadata.metabook = data.template.metadata.metabook;
     }
     this.set('nbformat', data.json.nbformat);
@@ -86,10 +90,12 @@ metabook.models.MetabookModel = (function(superClass) {
         url: metabook.api.file_endpoint + metabook.api.path,
         type: call_type,
         data: data,
-        success: _.bind((function(json_data) {
+        success: _.bind((function(json_data, status, xhr) {
           alert('Succesfully uploaded data.');
-          this.set('id', json_data.new_id);
-          return history.replaceState(null, null, "./" + json_data.new_name);
+          if (json_data.new_id) {
+            this.set('id', json_data.new_id);
+            return history.replaceState(null, null, "./" + json_data.new_name);
+          }
         }), this),
         error: error_graph
       });

@@ -7,7 +7,7 @@ graphics = {};
 custom_shapes = [];
 
 init_jointjs = function(graph_template, graph_json) {
-  var cell_collection, cell_model, code_cells, elements, graph, i, len, link, links, node, paper_holder, prev_node, pycell, setting_increment_x, setting_increment_y, setting_start_x, setting_start_y;
+  var cell_collection, cell_model, code_cells, content, elements, graph, i, len, link, links, node, paper_holder, prev_node, pycell, setting_increment_x, setting_increment_y, setting_start_x, setting_start_y;
   paper_holder = $(Settings.id.graph_container);
   Obj.graph = new joint.dia.Graph();
   Obj.mainpaper = new GraphPaper({
@@ -34,12 +34,13 @@ init_jointjs = function(graph_template, graph_json) {
     pycell = code_cells[i];
     cell_model = new metabook.models.CellModel(pycell, pycell);
     cell_collection.add(cell_model);
+    content = typeof pycell.source !== "string" ? content = pycell.source.join("") : content = pycell.source;
     node = new joint.shapes.html.Node({
       position: {
         x: setting_start_x,
         y: setting_start_y
       },
-      content: pycell.source.join(""),
+      content: content,
       footing_content: "ipynb cell [" + pycell.execution_count + "]",
       node_markup: {
         node_viewer: '<div class="node_viewer python" data-metabook="true"></div>',

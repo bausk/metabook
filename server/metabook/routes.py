@@ -50,7 +50,7 @@ class GraphHandler(tornado.web.RequestHandler):
                 return ""
             try:
                 with open(lpath) as data_file:
-                    data = json.load(data_file)
+                    data = json.load(data_file, encoding=data_file.encoding)
             except EnvironmentError:
                 raise tornado.web.HTTPError(404)
             return data

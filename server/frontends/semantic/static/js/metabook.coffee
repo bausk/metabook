@@ -29,6 +29,10 @@ metabook.api.get_file = (success, error) ->
 class metabook.models.CellModel extends Backbone.Model
     initialize: (attributes, data) ->
         # TODO Something
+        # @on('change', () -> alert('model changed'))
+    update_data: (data) ->
+        # alert(this)
+        @set('source', data)
 
 class metabook.models.CellCollection extends Backbone.Collection
     model: metabook.models.CellModel
@@ -40,7 +44,7 @@ class metabook.models.MetabookModel extends Backbone.Model
         # define if our metadata is present, i.e. this notebook has been set up to work as metabook
 
         # TODO: outdated; metadata is set in the initialization
-        if not 'metabook' of data.json.metadata
+        if not('metabook' of data.json.metadata)
             # inject template metadata
             data.json.metadata.metabook = data.template.metadata.metabook
 
@@ -65,12 +69,13 @@ class metabook.models.MetabookModel extends Backbone.Model
                 url: metabook.api.file_endpoint + metabook.api.path
                 type: call_type
                 data: data
-                success: _.bind(((json_data) ->
+                success: _.bind(((json_data, status, xhr) ->
                     alert('Succesfully uploaded data.')
                     # TODO: 'new_id' is model id, update it
                     # TODO: 'new_name' is filename to fix in history
-                    @set('id', json_data.new_id)
-                    history.replaceState(null, null, "./" + json_data.new_name)
+                    if json_data.new_id
+                        @set('id', json_data.new_id)
+                        history.replaceState(null, null, "./" + json_data.new_name)
                 ), this)
                 error: error_graph
             )

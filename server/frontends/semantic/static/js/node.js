@@ -2,15 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({
-  initialize: function(attrs, data) {
-    joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
-    _.each(data.cell_model, _.bind((function(value, key) {
-      return this.set(key, value);
-    }), this));
-    return this.cell_model = data.cell_model;
-  }
-}, joint.shapes.basic.PortsModelInterface, {
+joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.shapes.basic.PortsModelInterface, {
   markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
   portMarkup: '<g class="port port<%= id %>"><circle class="port-body"/></g>',
   defaults: joint.util.deepSupplement({
@@ -88,6 +80,18 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({
       footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
     }
   }, joint.shapes.basic.Generic.prototype.defaults),
+  initialize: function(attrs, data) {
+    _.each(data.cell_model, _.bind((function(value, key) {
+      return this.set(key, value);
+    }), this));
+    this.cell_model = data.cell_model;
+    this.on('change', _.bind((function() {
+      return this.cell_model.update_data(this.get('content'));
+    }), this));
+    this.updatePortsAttrs();
+    this.on('change:inPorts change:outPorts', this.updatePortsAttrs, this);
+    return this.constructor.__super__.constructor.__super__.initialize.apply(this, arguments);
+  },
   getPortAttrs: function(portName, index, total, selector, type) {
     var attrs, portBodySelector, portClass, portLabelSelector, portSelector;
     attrs = {};

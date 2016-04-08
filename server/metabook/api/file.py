@@ -48,7 +48,16 @@ class FileHandler(tornado.web.RequestHandler):
 
     @tornado.gen.coroutine
     def put(self, uri):
-        pass
+        data = self.request.body.decode('utf-8')
+        try:
+            with open(local_path(uri), "w") as data_file:
+                data_file.write(data)
+        except EnvironmentError:
+            raise tornado.web.HTTPError(500)
+        self.write(
+            {"success": True,
+             }
+        )
 
 
 class TemplateHandler(tornado.web.RequestHandler):
