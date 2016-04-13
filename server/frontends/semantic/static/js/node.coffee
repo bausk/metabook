@@ -53,16 +53,24 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
 
         initialize: (attrs, data) ->
             # joint.shapes.basic.GenericNode.prototype.initialize.apply(this, arguments)
-            _.each(data.cell_model, _.bind(((value, key) ->
-                @set(key, value)
-                ), this)
-            )
+            # WHY??
+            #_.each(data.cell_model, _.bind(((value, key) ->
+            #    @set(key, value)
+            #    ), this)
+            #)
             @cell_model = data.cell_model
-            @on('change', _.bind((() ->
+            @on('change:content', _.bind((() ->
                     #alert('small model change!')
-                    @cell_model.update_data(@get('content'))
+                    @cell_model.update_data(this)
                 ), this)
             )
+
+            @on('change:position', _.bind((() ->
+                    #alert('small model change!')
+                    @cell_model.update_data(this)
+                ), this)
+            )
+
 
             @updatePortsAttrs()
             @on('change:inPorts change:outPorts', @updatePortsAttrs, this)
@@ -109,7 +117,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
 
     content: {}
 
-    initialize: ->
+    initialize: (attributes, data) ->
         #_.bindAll is prolly not needed
         #_.bindAll(this, 'updateBox')
         joint.dia.ElementView.prototype.initialize.apply(this, arguments)

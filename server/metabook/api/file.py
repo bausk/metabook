@@ -1,7 +1,7 @@
 import tornado.web
 import tornado.gen
 import tornado.websocket
-from ..local.files import local_path, open_new_file, uri_parse
+from ..local.files import local_path, open_new_file, uri_parse, convert_default
 from ..config import metabook_config
 import json
 import uuid
@@ -36,13 +36,15 @@ class FileHandler(tornado.web.RequestHandler):
             with data_file:
                 new_name = filename
                 data_json['metadata']['metabook']['id'] = new_id
-                json.dump(data_json, data_file)
+                data_file.write(convert_default(data_json))
         except EnvironmentError:
             raise tornado.web.HTTPError(500)
         self.write(
             {"success": True,
              "new_name": new_name,
-             "new_id": new_id
+             "new_path": path + filename,
+             "new_id": new_id,
+
              }
         )
 
@@ -51,7 +53,7 @@ class FileHandler(tornado.web.RequestHandler):
         data = self.request.body.decode('utf-8')
         try:
             with open(local_path(uri), "w") as data_file:
-                data_file.write(data)
+                data_file.write(convert_default(data))
         except EnvironmentError:
             raise tornado.web.HTTPError(500)
         self.write(

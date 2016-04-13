@@ -81,12 +81,12 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
     }
   }, joint.shapes.basic.Generic.prototype.defaults),
   initialize: function(attrs, data) {
-    _.each(data.cell_model, _.bind((function(value, key) {
-      return this.set(key, value);
-    }), this));
     this.cell_model = data.cell_model;
-    this.on('change', _.bind((function() {
-      return this.cell_model.update_data(this.get('content'));
+    this.on('change:content', _.bind((function() {
+      return this.cell_model.update_data(this);
+    }), this));
+    this.on('change:position', _.bind((function() {
+      return this.cell_model.update_data(this);
     }), this));
     this.updatePortsAttrs();
     this.on('change:inPorts change:outPorts', this.updatePortsAttrs, this);
@@ -122,7 +122,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
 joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface, {
   template: ['<div style="position:absolute" class="node_container selection-box">', '<table class="ui very compact celled table node_table">', '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>', '<tbody><tr class="content_row"><td class="node_empty"></td>', '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>', '<td class="node_empty"></td></tr></tbody>', '<tfoot><tr><th colspan="3" class="node_footing"><%= footing %></th></tr></tfoot>', '</table>', '</div>'].join(''),
   content: {},
-  initialize: function() {
+  initialize: function(attributes, data) {
     joint.dia.ElementView.prototype.initialize.apply(this, arguments);
     this.isdraggable = false;
     this.isedited = false;

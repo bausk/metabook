@@ -4,7 +4,7 @@ graphics = {}
 custom_shapes = []
 
 
-init_jointjs = (graph_template, graph_json) ->
+init_jointjs = (metabook_model) ->
     paper_holder = $(Settings.id.graph_container)
     Obj.graph = new joint.dia.Graph()
     Obj.mainpaper = new GraphPaper({
@@ -17,11 +17,6 @@ init_jointjs = (graph_template, graph_json) ->
     })
 
     graph = Obj.graph
-    setting_start_x = 30
-    setting_start_y = 30
-    setting_increment_x = 500
-    setting_increment_y = 100
-
 
     # 1. obj is our input.
     # 2. metabook is our keys and settings
@@ -30,30 +25,25 @@ init_jointjs = (graph_template, graph_json) ->
     # file_id: "{% if 'new' in request.arguments %}{% else %}0123456789{% end %}",
     # path: "{{uri}}"
     # 3. branch for new vs saved notebook
-    elements = []
-    links = []
+    elems_list = []
+    links_list = []
 
+    cells = metabook_model.get("cells")
+    links = metabook_model.get("metadata").metabook.links
 
-    prev_node = undefined
-    # existing notebook
-    code_cells = _.filter(graph_json.cells, (o) -> o['cell_type'] is "code")
-
-    cell_collection = new metabook.models.CellCollection()
-
-    for pycell in code_cells
-
-        cell_model = new metabook.models.CellModel(pycell, pycell)
-        cell_collection.add(cell_model)
-
-        content =
-        if typeof(pycell.source) != "string"
-            content = pycell.source.join("")
+    cells.each( (cell_model) ->
+        source = cell_model.get('source')
+        metadata = cell_model.get('metadata')
+        id = metadata.metabook.id
+        if typeof(source) != "string"
+            content = source.join("")
         else
-            content = pycell.source
+            content = source
         node = new joint.shapes.html.Node(
-            position: { x: setting_start_x, y: setting_start_y }
+            id: id
+            position: { x: metadata.metabook.position.x, y: metadata.metabook.position.y }
             content: content
-            footing_content: "ipynb cell [#{pycell.execution_count}]"
+            footing_content: "ipynb cell [#{cell_model.get('execution_count')}]"
             node_markup:
                 node_viewer: '<div class="node_viewer python" data-metabook="true"></div>'
                 node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
@@ -62,33 +52,25 @@ init_jointjs = (graph_template, graph_json) ->
                 'max-height': 200
                 'min-width': 250
                 'max-width': 500
-            inPorts:
-                ['in:locals']
-            outPorts:
-                ['out:locals']
-        , {cell_model: cell_model}
+            inPorts: metadata.metabook.inPorts
+            outPorts: metadata.metabook.outPorts
+        , {cell_model}
         )
+        elems_list.push(node)
+    )
 
+    links.each( (link_model) ->
+        link = new joint.shapes.html.Link(
+            source: link_model.get('source')
+            target: link_model.get('target')
+            id: link_model.get('id')
+        )
+        links_list.push(link)
+    )
 
+    graph.addCells([elems_list..., links_list...])
 
-        elements.push(node)
-        if prev_node
-            link = new joint.shapes.html.Link(
-                source:
-                    id: prev_node.id
-                    port: 'out:locals'
-                target:
-                    id: node.id
-                    port: 'in:locals'
-            )
-            links.push(link)
-        prev_node = node
-        setting_start_x += setting_increment_x
-        setting_start_y += setting_increment_y
-
-    graph.addCells([elements..., links...])
-
-    return cell_collection
+    #return [cell_collection, elements, links]
 
     #$('.node_viewer').each((i, block) ->
     #    hljs.highlightBlock(block)

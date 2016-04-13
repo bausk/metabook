@@ -8,7 +8,7 @@ ServerConfig = dict(
 
 metabook_config = DotMap(ServerConfig)
 
-metabook_config.locals.newfile = "New metabook{}.graph"
+metabook_config.locals.newfile = "New metabook{}.ipynb"
 metabook_config.extension = [".graph", ".ipynb"]
 metabook_config.routes.tree = "tree"
 metabook_config.routes.graph = "graph"

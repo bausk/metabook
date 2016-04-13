@@ -6,8 +6,8 @@ graphics = {};
 
 custom_shapes = [];
 
-init_jointjs = function(graph_template, graph_json) {
-  var cell_collection, cell_model, code_cells, content, elements, graph, i, len, link, links, node, paper_holder, prev_node, pycell, setting_increment_x, setting_increment_y, setting_start_x, setting_start_y;
+init_jointjs = function(metabook_model) {
+  var cells, elems_list, graph, links, links_list, paper_holder;
   paper_holder = $(Settings.id.graph_container);
   Obj.graph = new joint.dia.Graph();
   Obj.mainpaper = new GraphPaper({
@@ -19,29 +19,28 @@ init_jointjs = function(graph_template, graph_json) {
     defaultLink: new joint.shapes.html.Link
   });
   graph = Obj.graph;
-  setting_start_x = 30;
-  setting_start_y = 30;
-  setting_increment_x = 500;
-  setting_increment_y = 100;
-  elements = [];
-  links = [];
-  prev_node = void 0;
-  code_cells = _.filter(graph_json.cells, function(o) {
-    return o['cell_type'] === "code";
-  });
-  cell_collection = new metabook.models.CellCollection();
-  for (i = 0, len = code_cells.length; i < len; i++) {
-    pycell = code_cells[i];
-    cell_model = new metabook.models.CellModel(pycell, pycell);
-    cell_collection.add(cell_model);
-    content = typeof pycell.source !== "string" ? content = pycell.source.join("") : content = pycell.source;
+  elems_list = [];
+  links_list = [];
+  cells = metabook_model.get("cells");
+  links = metabook_model.get("metadata").metabook.links;
+  cells.each(function(cell_model) {
+    var content, id, metadata, node, source;
+    source = cell_model.get('source');
+    metadata = cell_model.get('metadata');
+    id = metadata.metabook.id;
+    if (typeof source !== "string") {
+      content = source.join("");
+    } else {
+      content = source;
+    }
     node = new joint.shapes.html.Node({
+      id: id,
       position: {
-        x: setting_start_x,
-        y: setting_start_y
+        x: metadata.metabook.position.x,
+        y: metadata.metabook.position.y
       },
       content: content,
-      footing_content: "ipynb cell [" + pycell.execution_count + "]",
+      footing_content: "ipynb cell [" + (cell_model.get('execution_count')) + "]",
       node_markup: {
         node_viewer: '<div class="node_viewer python" data-metabook="true"></div>',
         node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
@@ -52,31 +51,23 @@ init_jointjs = function(graph_template, graph_json) {
         'min-width': 250,
         'max-width': 500
       },
-      inPorts: ['in:locals'],
-      outPorts: ['out:locals']
+      inPorts: metadata.metabook.inPorts,
+      outPorts: metadata.metabook.outPorts
     }, {
       cell_model: cell_model
     });
-    elements.push(node);
-    if (prev_node) {
-      link = new joint.shapes.html.Link({
-        source: {
-          id: prev_node.id,
-          port: 'out:locals'
-        },
-        target: {
-          id: node.id,
-          port: 'in:locals'
-        }
-      });
-      links.push(link);
-    }
-    prev_node = node;
-    setting_start_x += setting_increment_x;
-    setting_start_y += setting_increment_y;
-  }
-  graph.addCells(slice.call(elements).concat(slice.call(links)));
-  return cell_collection;
+    return elems_list.push(node);
+  });
+  links.each(function(link_model) {
+    var link;
+    link = new joint.shapes.html.Link({
+      source: link_model.get('source'),
+      target: link_model.get('target'),
+      id: link_model.get('id')
+    });
+    return links_list.push(link);
+  });
+  return graph.addCells(slice.call(elems_list).concat(slice.call(links_list)));
 };
 
 jointjs_attach_events = function(paper, graph) {

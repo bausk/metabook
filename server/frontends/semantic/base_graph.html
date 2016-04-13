@@ -49,12 +49,13 @@
 <script src="/static/js/graph.js"></script>
 <script language="JavaScript">
     metabook.api.root = "{{root}}";
-    metabook.api.file_endpoint = "{{root}}/{{metabook_config.routes.api.file}}/";
     metabook.api.template_endpoint = "{{root}}/{{metabook_config.routes.api.template}}/";
     metabook.api.solvers_endpoint = "{{root}}/{{metabook_config.routes.api.solvers}}/";
     metabook.api.sessions_endpoint = "{{root}}/{{metabook_config.routes.api.sessions}}/";
-    metabook.api.file_id = "{% if 'new' in request.arguments %}{% else %}0123456789{% end %}";
-    metabook.api.path = "{{uri}}";
+    metabook.api.file.endpoint = "{{root}}/{{metabook_config.routes.api.file}}/";
+    metabook.api.file.path = "{{uri}}";
+    metabook.api.file.name = "{{file_name}}";
+    metabook.options.new = {% if 'new' in request.arguments %}true{% else %}false{% end %};
 </script>
 
 {% end %}

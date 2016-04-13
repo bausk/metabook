@@ -67,36 +67,57 @@ $(document).ready ->
     # dim the screen while fetching file data
     $("#id2").dimmer({closable:false}).dimmer('show')
 
-    metabook.api.get_template(init_graph, error_graph)
 
+    # 1. Find out if we need template.
+    # Two template cases: creation of new file metabook.api.file.new = true
+    # or file is a raw ipynb, so metadata.metabook is undefined, will find out only after fetching the file
+    data_uri = (
+        ->
+            if metabook.options.new is true
+                # either default template or the one given by metabook.api.file.path
+                if metabook.api.file.name == ""
+                    # no filename so default template
+                    return metabook.api.template_endpoint
+                else
+                    #use file as template
+                    return metabook.api.file.endpoint + metabook.api.file.path
+            else
+                # this could be a raw ipynb or a well-formed graph, will find out after ajax request
+                return metabook.api.file.endpoint + metabook.api.file.path
+    )()
 
-init_graph = (graph_template) ->
+    #call with empty template for starters
+    metabook.api.get_ajax_data(data_uri, _.partial(init_graph, {}), error_graph)
 
-    if metabook.api.file_id != ""
-        metabook.api.get_file(_.partial(parse_graph, graph_template), error_graph)
+init_graph = (template, ajax_data) ->
+
+    # find out if graph is well-formed (metadata.metabook is present).
+    create_from = ""
+    if not metabook.api.is_good_form(ajax_data)
+        # still need to find metadata somewhere, so fetch the default template and loop back
+        if Object.keys(template).length == 0
+            metabook.api.get_ajax_data(metabook.api.template_endpoint, _.partial(init_graph, _, ajax_data), error_graph)
+            return
+        else
+            create_from = "ipynb" # influences generation of control flow links
+            # means even default template isn't in good form, so crash and burn
+            # NOPE: means we have import from ipynb, template is good, data is bad
+            # throw new Error()
     else
-        # File is new because there is no id
-        # TODO: if file is new, generate ID I guess...
-        parse_graph(graph_template, {})
+        if metabook.api.is_good_form(template)
+            #ipynb, needs to be converted
+            create_from = "ipynb" # influences generation of control flow links
 
-parse_graph = (graph_template, graph_json) ->
-    # TODO: build MetabookModel with submodels and bind them to jointjs models
+        else
+            # ajax_data is good form but template isn't
+            # ajax_data is either proper file or template for new file
+            # well-formed ajax_data, no need to apply template which is empty anyway
+            create_from = "native" # no need to auto-generate control flow links
 
-    if Object.keys(graph_json).length == 0
-        graph_json = graph_template
-    else if not('metabook' of graph_json.metadata)
-        graph_json.metadata.metabook = graph_template.metadata.metabook
-        graph_json.metadata.metabook.id = joint.util.uuid()
+    notebook = new metabook.models.MetabookModel({}, {json: ajax_data, create_from: create_from, template: template})
 
-
-    # TODO: if no metabook metadata, populate from template and generate id
-
-
-    cells_collection = init_jointjs(graph_template, graph_json)
-
-    notebook = new metabook.models.MetabookModel({'cells': cells_collection}, {template: graph_template, json: graph_json})
-
-
+    #[cells_collection, _, links] = init_jointjs(ajax_data)
+    init_jointjs(notebook)
 
     $("#id2").dimmer('hide')
 
