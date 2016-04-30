@@ -41,6 +41,7 @@
 
 <!--<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>-->
 <script src="/static/js/metabook.js"></script>
+<script src="/static/js/api.js"></script>
 <script src="/static/js/session.js"></script>
 <script src="/static/js/ui.js"></script>
 <script src="/static/js/elements.js"></script>
@@ -48,11 +49,12 @@
 <script src="/static/js/graph_jointjs.js"></script>
 <script src="/static/js/graph.js"></script>
 <script language="JavaScript">
-    metabook.api.root = "{{root}}";
-    metabook.api.template_endpoint = "{{root}}/{{metabook_config.routes.api.template}}/";
-    metabook.api.solvers_endpoint = "{{root}}/{{metabook_config.routes.api.solvers}}/";
-    metabook.api.sessions_endpoint = "{{root}}/{{metabook_config.routes.api.sessions}}/";
-    metabook.api.file.endpoint = "{{root}}/{{metabook_config.routes.api.file}}/";
+    metabook.api.protocol = "{{protocol}}";
+    metabook.api.root = "{{protocol}}://{{root}}";
+    metabook.api.template_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.template}}/";
+    metabook.api.solvers_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.solvers}}/";
+    metabook.api.sessions_endpoint = "{{root}}/{{metabook_config.routes.api.sessions}}";
+    metabook.api.file.endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.file}}/";
     metabook.api.file.path = "{{uri}}";
     metabook.api.file.name = "{{file_name}}";
     metabook.options.new = {% if 'new' in request.arguments %}true{% else %}false{% end %};

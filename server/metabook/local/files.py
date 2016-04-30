@@ -16,9 +16,10 @@ def local_path(uri: str) -> str:
 
 
 def host_info(request, path) -> tuple:
-    remote_root = "{}://{}".format(request.protocol, request.host)
+    protocol = request.protocol
+    remote_root = request.host
     level_up_path = path.rpartition('/')[0]
-    return remote_root, level_up_path
+    return protocol, remote_root, level_up_path
 
 
 def uri_parse(uri: str) -> (str, str):

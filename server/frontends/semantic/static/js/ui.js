@@ -123,12 +123,41 @@ metabook.ui.save = function(e) {
   return alert('save');
 };
 
-$("[data-action]").click(function(evt) {
-  var action;
-  action = $(this).data('action');
-  if (Settings.ui.actions.hasOwnProperty(action)) {
-    return Settings.ui.actions[action](evt);
+
+/* TODO DEPRECATE THIS SHIT
+$("[data-action]").click( (evt) ->
+    action = $(this).data('action')
+    if Settings.ui.actions.hasOwnProperty(action)
+        Settings.ui.actions[action](evt)
+)
+ */
+
+metabook.ui.Vent = (function() {
+  function Vent() {
+    _.extend(this, Backbone.Events);
   }
-});
+
+  Vent.prototype.register = function(handlers) {
+    var event_handler, eventclass, eventname, handler, results;
+    results = [];
+    for (eventclass in handlers) {
+      handler = handlers[eventclass];
+      results.push((function() {
+        var ref, results1;
+        ref = handler['custom_events'];
+        results1 = [];
+        for (eventname in ref) {
+          event_handler = ref[eventname];
+          results1.push(this.listenTo(Backbone, eventclass + ":" + eventname, _.bind(event_handler, handler)));
+        }
+        return results1;
+      }).call(this));
+    }
+    return results;
+  };
+
+  return Vent;
+
+})();
 
 //# sourceMappingURL=ui.js.map

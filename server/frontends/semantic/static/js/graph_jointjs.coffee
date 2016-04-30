@@ -6,17 +6,15 @@ custom_shapes = []
 
 init_jointjs = (metabook_model) ->
     paper_holder = $(Settings.id.graph_container)
-    Obj.graph = new joint.dia.Graph()
-    Obj.mainpaper = new GraphPaper({
+    graph = new metabook.MetaGraph({}, metabook_model)
+    mainpaper = new GraphPaper({
         el: $(Settings.id.paper),
         width: paper_holder.width(),
         height: paper_holder.height(),
-        model: Obj.graph,
+        model: graph,
         gridSize: 1
         defaultLink: new joint.shapes.html.Link
     })
-
-    graph = Obj.graph
 
     # 1. obj is our input.
     # 2. metabook is our keys and settings
@@ -75,7 +73,7 @@ init_jointjs = (metabook_model) ->
     #$('.node_viewer').each((i, block) ->
     #    hljs.highlightBlock(block)
     #)
-
+    return mainpaper
 
 jointjs_attach_events = (paper, graph) ->
 

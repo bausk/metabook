@@ -13,7 +13,8 @@ metabook = {
   models: {},
   views: {},
   defaults: {},
-  options: {}
+  options: {},
+  events: {}
 };
 
 metabook.api.get_template = function(success, error) {
@@ -47,7 +48,9 @@ metabook.api.is_good_form = function(json_data) {
   if (typeof json_data === 'object') {
     if ('metadata' in json_data) {
       if ('metabook' in json_data.metadata) {
-        return true;
+        if ('links' in json_data.metadata.metabook) {
+          return true;
+        }
       }
     }
   }
@@ -201,9 +204,6 @@ metabook.models.MetabookModel = (function(superClass) {
     }
     metadata = void 0;
     prev_cell = void 0;
-    if (generate_id) {
-      data.json.metadata.metabook.id = joint.util.uuid();
-    }
     link_collection = new metabook.models.LinkCollection();
     if (data.create_from !== "native") {
       code_cells = cell_collection.filter({
@@ -238,9 +238,9 @@ metabook.models.MetabookModel = (function(superClass) {
         link_collection.add(link_model);
       }
       metadata = data.json.metadata;
-      if (generate_id === true) {
-        metadata.metabook.id = joint.util.uuid();
-      }
+    }
+    if (generate_id === true) {
+      metadata.metabook.id = joint.util.uuid();
     }
     metadata.metabook.links = link_collection;
     this.set('cells', cell_collection);
@@ -252,8 +252,8 @@ metabook.models.MetabookModel = (function(superClass) {
     }
   };
 
-  MetabookModel.prototype.actions = {
-    'notebook.save': function(ev) {
+  MetabookModel.prototype.custom_events = {
+    'save': function(caller, ev) {
       var call_type, data;
       data = JSON.stringify(this.attributes);
       call_type = metabook.options["new"] ? 'POST' : 'PUT';
@@ -273,6 +273,9 @@ metabook.models.MetabookModel = (function(superClass) {
         }), this),
         error: error_graph
       });
+    },
+    'solve': function(caller, ev) {
+      return this.session.solve_all(this, ev);
     }
   };
 
@@ -289,7 +292,10 @@ metabook.views.MenuView = (function(superClass) {
 
   MenuView.prototype.events = {
     "click [data-action]": function(ev) {
-      return _.bind(this.model.actions[$(ev.target).data('action')], this.model)(ev);
+      var custom_event;
+      custom_event = ev.target.dataset.action;
+      Backbone.trigger(custom_event, this.model, ev);
+      return console.log("MenuView event triggered");
     }
   };
 

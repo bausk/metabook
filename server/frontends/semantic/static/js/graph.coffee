@@ -15,11 +15,6 @@ Settings =
         paper: "#myholder"
         svg: "#v-2"
 
-Obj =
-    graph: undefined
-    mainpaper: undefined
-
-
 $(document).ready ->
     WebSocketTest = undefined
 
@@ -27,7 +22,7 @@ $(document).ready ->
 
     WebSocketTest = (ev) ->
         messageContainer.text("WebSocket is supported by your Browser!")
-        ws = new WebSocket("ws://" + window.location.host + "/api/session/guise?Id=123456789")
+        ws = new WebSocket("ws://" + window.location.host + "/api/sessions/guise?Id=123456789")
 
         ws.onopen = ->
             $('#bSend').on("click", ->
@@ -52,6 +47,8 @@ $(document).ready ->
 
     $('#bConnect').on("click", WebSocketTest)
 
+
+    # closure example
     makeCounter = ->
         count = 0
         {increment: -> count++
@@ -117,7 +114,17 @@ init_graph = (template, ajax_data) ->
     notebook = new metabook.models.MetabookModel({}, {json: ajax_data, create_from: create_from, template: template})
 
     #[cells_collection, _, links] = init_jointjs(ajax_data)
-    init_jointjs(notebook)
+    paper = init_jointjs(notebook)
+
+    # TODO: set up long websocket server session
+
+    notebook.session = new metabook.api.Session(metabook.api.sessions_endpoint)
+
+    #$("[data-session]").on('click', (e) ->
+    #    action = e.target.dataset.session
+    #    notebook.session[action].apply(this, arguments)
+    #)
+
 
     $("#id2").dimmer('hide')
 
@@ -131,8 +138,22 @@ init_graph = (template, ajax_data) ->
 
     #attach context menu events
     ContextMenu.init(Settings)
-    bind_ui_actions(Settings)
-    jointjs_attach_events(Obj.mainpaper, Obj.graph)
+
+    uivent = new metabook.ui.Vent()
+    uivent.register({'session' : notebook.session, 'model' : notebook})
+
+    # TODO: DEPRECATE THIS SHIT
+    ###
+    $("[data-action]").on('click', (e) ->
+        action = e.target.dataset.action
+        actions = Settings.ui.actions
+        if `action in actions`
+            ContextMenu.active_menu_off()
+            actions[action].apply(paper, arguments)
+    )
+    ###
+
+    jointjs_attach_events(paper, paper.model)
 
 
     menuview = new metabook.views.MenuView(
@@ -140,14 +161,8 @@ init_graph = (template, ajax_data) ->
         model: notebook
     )
 
-bind_ui_actions = (settings) ->
-    $("[data-action]").on('click', (e) ->
-        action = e.target.dataset.action
-        actions = Settings.ui.actions
-        if `action in actions`
-            ContextMenu.active_menu_off()
-            actions[action].apply(this, arguments)
-    )
+
+
 
 error_graph = (e) ->
     $("#id2").dimmer('hide')

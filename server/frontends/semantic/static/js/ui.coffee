@@ -1,3 +1,4 @@
+
 #
 # Context menu taken from
 # https://github.com/callmenick/Custom-Context-Menu
@@ -108,6 +109,8 @@ ContextMenu = {
 
 metabook.ui.add = (e) ->
     alert("add")
+    # @ is paper,
+    # @model.metabook is the MetaBook model object
 
 metabook.ui.edit = (e) ->
     alert("edit")
@@ -118,8 +121,25 @@ metabook.ui.delete = (e) ->
 metabook.ui.save = (e) ->
     alert('save')
 
+### TODO DEPRECATE THIS SHIT
 $("[data-action]").click( (evt) ->
     action = $(this).data('action')
     if Settings.ui.actions.hasOwnProperty(action)
         Settings.ui.actions[action](evt)
 )
+
+###
+
+# fucking black sorcery right here
+
+
+class metabook.ui.Vent #extends Backbone.Events
+    constructor: ->
+        _.extend @, Backbone.Events
+    register: (handlers) ->
+        # super(@, arguments)
+        # handlers have format: 'eventclass' : object['custom_events'][event] and we have to listen to eventclass:event
+        for eventclass, handler of handlers
+           for eventname, event_handler of handler['custom_events']
+               @listenTo Backbone, eventclass + ":" + eventname, _.bind(event_handler, handler)
+

@@ -1,4 +1,11 @@
 
+
+metabook.MetaGraph = joint.dia.Graph.extend(
+    initialize: (attrs, data) ->
+        @metabook = data
+        @constructor.__super__.initialize.apply(this, arguments)
+    )
+
 joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
     joint.shapes.basic.PortsModelInterface,
         markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
@@ -44,7 +51,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
             content: 'Click to edit code'
             footing_content: 'Version A4D3E453'
             node_markup:
-                    head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>'
+                    head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label"><span class="fa fa-close"></span></label></span>'
                     node_viewer: '<div class="node_viewer"></div>'
                     node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
                     footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
@@ -52,12 +59,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
         }, joint.shapes.basic.Generic.prototype.defaults),
 
         initialize: (attrs, data) ->
-            # joint.shapes.basic.GenericNode.prototype.initialize.apply(this, arguments)
-            # WHY??
-            #_.each(data.cell_model, _.bind(((value, key) ->
-            #    @set(key, value)
-            #    ), this)
-            #)
+
             @cell_model = data.cell_model
             @on('change:content', _.bind((() ->
                     #alert('small model change!')
@@ -190,6 +192,19 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         ###
         @$box.find('.btn_close').on('click', _.bind(@model.remove, @model))
 
+
+        # TODO Normal event dispatch!
+        #@$box.find('[data-session]').on('click', _.bind( (evt) ->
+        #    action = evt.target.dataset.session
+        #    @graph.metabook.session[action](this)
+        #, @model))
+
+        @$box.find('[data-action]').on 'click', @dispatch(this)
+            #custom_event = evt.target.dataset.action
+            #Backbone.trigger custom_event, @
+            #console.log "event triggered раз"
+
+
         #// Update the box position whenever the underlying model changes.
         @model.on('change', @updateBox, this)
         #// Remove the box when the model gets removed from the graph.
@@ -214,6 +229,11 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
 
         #this.listenTo(@model, 'process:ports', @update)
 
+    dispatch: (self) ->
+        return (evt) ->
+            custom_event = @dataset.action
+            Backbone.trigger custom_event, self, evt
+            console.log "event triggered раз"
 
     render: ->
         @processPorts()

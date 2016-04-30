@@ -7,18 +7,17 @@ graphics = {};
 custom_shapes = [];
 
 init_jointjs = function(metabook_model) {
-  var cells, elems_list, graph, links, links_list, paper_holder;
+  var cells, elems_list, graph, links, links_list, mainpaper, paper_holder;
   paper_holder = $(Settings.id.graph_container);
-  Obj.graph = new joint.dia.Graph();
-  Obj.mainpaper = new GraphPaper({
+  graph = new metabook.MetaGraph({}, metabook_model);
+  mainpaper = new GraphPaper({
     el: $(Settings.id.paper),
     width: paper_holder.width(),
     height: paper_holder.height(),
-    model: Obj.graph,
+    model: graph,
     gridSize: 1,
     defaultLink: new joint.shapes.html.Link
   });
-  graph = Obj.graph;
   elems_list = [];
   links_list = [];
   cells = metabook_model.get("cells");
@@ -67,7 +66,8 @@ init_jointjs = function(metabook_model) {
     });
     return links_list.push(link);
   });
-  return graph.addCells(slice.call(elems_list).concat(slice.call(links_list)));
+  graph.addCells(slice.call(elems_list).concat(slice.call(links_list)));
+  return mainpaper;
 };
 
 jointjs_attach_events = function(paper, graph) {

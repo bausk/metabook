@@ -2,6 +2,13 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
+metabook.MetaGraph = joint.dia.Graph.extend({
+  initialize: function(attrs, data) {
+    this.metabook = data;
+    return this.constructor.__super__.initialize.apply(this, arguments);
+  }
+});
+
 joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.shapes.basic.PortsModelInterface, {
   markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
   portMarkup: '<g class="port port<%= id %>"><circle class="port-body"/></g>',
@@ -74,7 +81,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
     content: 'Click to edit code',
     footing_content: 'Version A4D3E453',
     node_markup: {
-      head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>',
+      head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label"><span class="fa fa-close"></span></label></span>',
       node_viewer: '<div class="node_viewer"></div>',
       node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>',
       footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
@@ -193,10 +200,19 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     @$box.find('select').val(@model.get('select'))
      */
     this.$box.find('.btn_close').on('click', _.bind(this.model.remove, this.model));
+    this.$box.find('[data-action]').on('click', this.dispatch(this));
     this.model.on('change', this.updateBox, this);
     this.model.on('remove', this.removeBox, this);
     custom_shapes.push(this);
     return this.$box.find('.node_content').on('click', _.bind(this.startEditInPlace, this));
+  },
+  dispatch: function(self) {
+    return function(evt) {
+      var custom_event;
+      custom_event = this.dataset.action;
+      Backbone.trigger(custom_event, self, evt);
+      return console.log("event triggered раз");
+    };
   },
   render: function() {
     this.processPorts();

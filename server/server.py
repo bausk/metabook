@@ -36,6 +36,9 @@ define("static", default=metabook_config.static, help="static directory", type=s
 
 class Application(tornado.web.Application):
     def __init__(self):
+
+        self.solvers = {}
+
         handlers = [
             (r"/" + metabook_config.routes.tree, metabook.routes.RedirectHandler),
             (r"/" + metabook_config.routes.tree + r"(/.*)+", metabook.routes.MainHandler, dict(init=0)),
@@ -44,7 +47,7 @@ class Application(tornado.web.Application):
             (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.file.FileHandler),
             (r"/" + metabook_config.routes.api.template + r"/(.*)", metabook.api.file.TemplateHandler),
             (r"/" + metabook_config.routes.api.solvers + r"/(.*)", metabook.api.file.SolverHandler),
-            (r"/" + metabook_config.routes.api.sessions + r"/(.*)", metabook.api.sessions.SessionHandler),
+            (r"/" + metabook_config.routes.api.sessions + r"(.*)", metabook.api.sessions.SessionHandler, {'solvers': self.solvers}),
             (r"/.*", metabook.routes.RedirectHandler)
 
         ]
