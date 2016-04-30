@@ -8,6 +8,7 @@ metabook = {
     views: {}
     defaults: {}
     options: {}
+    events: {}
 }
 
 metabook.api.get_template = (success, error) ->
@@ -38,7 +39,8 @@ metabook.api.is_good_form = (json_data) ->
     if typeof json_data is 'object'
         if 'metadata' of json_data
             if 'metabook' of json_data.metadata
-                return true
+                if 'links' of json_data.metadata.metabook
+                    return true
     return false
 
 metabook.defaults =
@@ -132,9 +134,6 @@ class metabook.models.MetabookModel extends Backbone.Model
         metadata = undefined
         prev_cell = undefined
 
-        if generate_id
-            data.json.metadata.metabook.id = joint.util.uuid()
-
         link_collection = new metabook.models.LinkCollection()
 
         if data.create_from != "native"
@@ -166,8 +165,8 @@ class metabook.models.MetabookModel extends Backbone.Model
                 link_collection.add(link_model)
 
             metadata = data.json.metadata
-            if generate_id == true
-                metadata.metabook.id = joint.util.uuid()
+        if generate_id == true
+            metadata.metabook.id = joint.util.uuid()
 
         metadata.metabook.links = link_collection
         @set('cells', cell_collection)
@@ -178,10 +177,8 @@ class metabook.models.MetabookModel extends Backbone.Model
         if metadata.metabook.id
             @set('id', metadata.metabook.id)
 
-    actions:
-        'notebook.save': (ev) ->
-            # TODO execute PUT if id exists,
-            # TODO execute POST if no id
+    custom_events:
+        'save': (caller, ev) ->
             data = JSON.stringify(this.attributes)
             # data = JSON.stringify(Obj.graph) #just kidding
             call_type = if metabook.options.new then 'POST' else 'PUT'
@@ -191,8 +188,6 @@ class metabook.models.MetabookModel extends Backbone.Model
                 data: data
                 success: _.bind(((json_data, status, xhr) ->
                     alert('Succesfully uploaded data.')
-                    # TODO: 'new_id' is model id, update it
-                    # TODO: 'new_name' is filename to fix in history
                     if json_data.new_id
                         @set('id', json_data.new_id)
                         history.replaceState(null, null, "/" + json_data.new_path)
@@ -203,11 +198,14 @@ class metabook.models.MetabookModel extends Backbone.Model
                 ), this)
                 error: error_graph
             )
-
+        'solve': (caller, ev) ->
+            @session.solve_all(@, ev)
 
 
 class metabook.views.MenuView extends Backbone.View
 
     events:
         "click [data-action]": (ev) ->
-            _.bind(@model.actions[$(ev.target).data('action')], @model)(ev)
+            custom_event = ev.target.dataset.action
+            Backbone.trigger custom_event, @model, ev
+            console.log "MenuView event triggered"
