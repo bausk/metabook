@@ -108,7 +108,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         # <TD> structure is permanent. node_X table parts can be populated during initialize() with arbitrary content
         '<div style="position:absolute" class="node_container selection-box">'
         '<table class="ui very compact celled table node_table">'
-        '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>'
+        '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head" data-content="Blergh"><%= head %></th></tr></thead>'
         '<tbody><tr class="content_row"><td class="node_empty"></td>'
         '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>'
         '<td class="node_empty"></td></tr></tbody>'
@@ -152,6 +152,9 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
             @dragpoint.client_y = @model.get('position').y
             @isdraggable = true
         ), this)
+
+        @$box.find('th.node_head').popup()
+
 
         #Drag behavior
         $(window).on 'mousemove', _.bind(((evt) ->
@@ -283,7 +286,9 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         _.each(pairs, _.bind(
             (pair) ->
                 @$box.find('tbody tr:last td').first().replaceWith("<td class='node_in'>#{pair[0] ? ""}</td>")
-                @$box.find('tbody tr:last td').last().replaceWith("<td class='node_out'>#{pair[1] ? ""}</td>")
+                $("<td class='ui node_out' data-content='fssdfsdfsdfs'>#{pair[1] ? ""}</td>").replaceAll(@$box.find('tbody tr:last td').last()).popup(
+                    position: 'right center'
+                )
                 @$box.find('tbody tr:last').after('<tr><td class="node_empty"></td><td class="node_empty"></td></tr>')
                 rows++
         , this)

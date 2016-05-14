@@ -46,6 +46,7 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
 
         self.solver = None
+        self.results = {}
         self.id = ""
         self.handlers = {
             'run_cell': self.run_cell,
@@ -65,14 +66,15 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         self.solver = self.application.solvers[self.id]
 
     def on_message(self, message):
-
+        # msg_type of message corresponds to method in self.handlers which normally just map to solver methods
         print("Client %s received a message : %s" % (self.id, message))
         msg = Message(message)
         identifier = msg.header.msg_type
         if identifier in self.handlers:
             result = self.handlers[identifier](msg)
-        self.write_message(result.stringify())
-
+            self.write_message(result.stringify())
+            return
+        raise EnvironmentError
 
     def on_close(self):
         if self.id in clients:
@@ -84,4 +86,7 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         return ReplyMessage(solver, result)
 
     def solve_all(self, message):
-        pass
+        links = message.content.links
+        cells = message.content.cells
+        result = self.solver.solve_all(cells, links)
+        return ReplyMessage(self.results, result)

@@ -25,12 +25,29 @@ class metabook.api.Session
         @ws.send(msg.serialize())
 
     solve_all: (metabook_model, event) ->
+        cells = _.map(
+            metabook_model.get('cells').models,
+            (cell) ->
+                result = {}
+                result.id = cell.attributes.metadata.metabook.id
+                result.source = cell.attributes.source
+                result.inPorts = cell.attributes.metadata.metabook.inPorts
+                result.outPorts = cell.attributes.metadata.metabook.outPorts
+                return result
+        )
+        links = _.map(
+            metabook_model.get('metadata').metabook.links.models,
+            (link) ->
+                result = {}
+                result.id = link.attributes.id
+                result.target = link.attributes.target
+                result.source = link.attributes.source
+                return result
+        )
         msg = new metabook.messages.Message(
             session: @id
             msg_type: "solve_all"
-            content:
-                cells: metabook_model.get('cells')
-                links: metabook_model.get('metadata').metabook.links
+            content: {cells, links}
         )
 
         @ws.send(msg.serialize())

@@ -25,13 +25,30 @@ metabook.api.Session = (function() {
   };
 
   Session.prototype.solve_all = function(metabook_model, event) {
-    var msg;
+    var cells, links, msg;
+    cells = _.map(metabook_model.get('cells').models, function(cell) {
+      var result;
+      result = {};
+      result.id = cell.attributes.metadata.metabook.id;
+      result.source = cell.attributes.source;
+      result.inPorts = cell.attributes.metadata.metabook.inPorts;
+      result.outPorts = cell.attributes.metadata.metabook.outPorts;
+      return result;
+    });
+    links = _.map(metabook_model.get('metadata').metabook.links.models, function(link) {
+      var result;
+      result = {};
+      result.id = link.attributes.id;
+      result.target = link.attributes.target;
+      result.source = link.attributes.source;
+      return result;
+    });
     msg = new metabook.messages.Message({
       session: this.id,
       msg_type: "solve_all",
       content: {
-        cells: metabook_model.get('cells'),
-        links: metabook_model.get('metadata').metabook.links
+        cells: cells,
+        links: links
       }
     });
     this.ws.send(msg.serialize());

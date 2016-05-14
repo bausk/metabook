@@ -89,6 +89,7 @@ $(document).ready ->
 init_graph = (template, ajax_data) ->
 
     # find out if graph is well-formed (metadata.metabook is present).
+    # TODO: This is all flawed. Refactor to Get_data('new', 'native', 'ipynb')
     create_from = ""
     if not metabook.api.is_good_form(ajax_data)
         # still need to find metadata somewhere, so fetch the default template and loop back

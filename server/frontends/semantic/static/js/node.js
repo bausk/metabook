@@ -127,7 +127,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
 }));
 
 joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface, {
-  template: ['<div style="position:absolute" class="node_container selection-box">', '<table class="ui very compact celled table node_table">', '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head"><%= head %></th></tr></thead>', '<tbody><tr class="content_row"><td class="node_empty"></td>', '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>', '<td class="node_empty"></td></tr></tbody>', '<tfoot><tr><th colspan="3" class="node_footing"><%= footing %></th></tr></tfoot>', '</table>', '</div>'].join(''),
+  template: ['<div style="position:absolute" class="node_container selection-box">', '<table class="ui very compact celled table node_table">', '<thead><tr data-metabook="node-head"><th colspan="3" class="node_head" data-content="Blergh"><%= head %></th></tr></thead>', '<tbody><tr class="content_row"><td class="node_empty"></td>', '<td class="node_content" rowspan="1"><%= node_viewer %><%= node_editor %></td>', '<td class="node_empty"></td></tr></tbody>', '<tfoot><tr><th colspan="3" class="node_footing"><%= footing %></th></tr></tfoot>', '</table>', '</div>'].join(''),
   content: {},
   initialize: function(attributes, data) {
     joint.dia.ElementView.prototype.initialize.apply(this, arguments);
@@ -165,6 +165,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
       this.dragpoint.client_y = this.model.get('position').y;
       return this.isdraggable = true;
     }), this));
+    this.$box.find('th.node_head').popup();
     $(window).on('mousemove', _.bind((function(evt) {
       var point;
       if (this.isdraggable) {
@@ -254,7 +255,9 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     _.each(pairs, _.bind(function(pair) {
       var ref, ref1;
       this.$box.find('tbody tr:last td').first().replaceWith("<td class='node_in'>" + ((ref = pair[0]) != null ? ref : "") + "</td>");
-      this.$box.find('tbody tr:last td').last().replaceWith("<td class='node_out'>" + ((ref1 = pair[1]) != null ? ref1 : "") + "</td>");
+      $("<td class='ui node_out' data-content='fssdfsdfsdfs'>" + ((ref1 = pair[1]) != null ? ref1 : "") + "</td>").replaceAll(this.$box.find('tbody tr:last td').last()).popup({
+        position: 'right center'
+      });
       this.$box.find('tbody tr:last').after('<tr><td class="node_empty"></td><td class="node_empty"></td></tr>');
       return rows++;
     }, this));
