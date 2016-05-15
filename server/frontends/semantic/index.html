@@ -24,7 +24,7 @@
     <tbody>
 
     <tr>
-       <td onclick="window.location='{{protocol}}://{{root}}/{{metabook_config.routes.tree}}'"><span class="fa fa-home"></span> Home </td>
+       <td onclick="window.location='{{protocol}}://{{root}}/{{metabook_config.routes.tree}}/'"><span class="fa fa-home"></span> Home </td>
     </tr>
     <tr>
        <td onclick="window.location='{{protocol}}://{{root}}/{{metabook_config.routes.tree}}{{level_up_path}}/'"><span class="fa fa-folder-open-o"></span> ..</td>
@@ -33,7 +33,7 @@
     {% for dirname in dirlist %}
 
     <tr>
-       <td onclick="window.location='{{protocol}}://{{root}}/{{metabook_config.routes.tree}}{{uri}}{{dirname}}/'"><span class="fa fa-folder-open"></span> {{dirname}}</td>
+       <td onclick="window.location='{{protocol}}://{{root}}/{{metabook_config.routes.tree}}{{uri}}/{{dirname}}/'"><span class="fa fa-folder-open"></span> {{dirname}}</td>
     </tr>
 
     {% end %}
@@ -41,7 +41,7 @@
     {% for filename in filelist %}
 
     <tr>
-       <td onclick="window.location='{{protocol}}://{{root}}/{{metabook_config.routes.graph}}{{uri}}{{filename}}'"><span class="fa fa-file-code-o"></span> {{filename}}</td>
+       <td onclick="window.location='{{protocol}}://{{root}}/{{metabook_config.routes.graph}}{{uri}}/{{filename}}'"><span class="fa fa-file-code-o"></span> {{filename}}</td>
     </tr>
 
     {% end %}

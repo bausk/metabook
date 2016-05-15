@@ -40,24 +40,16 @@ class MainHandler(tornado.web.RequestHandler):
 
 class RedirectHandler(tornado.web.RequestHandler):
     @tornado.gen.coroutine
-    def get(self):
-        self.redirect(r"/" + metabook_config.routes.tree + "/")
+    def get(self, uri=None):
+        if uri is None:
+            self.redirect("/" + metabook_config.routes.tree + "/")
+        else:
+            self.redirect(uri + "/")
 
 class GraphHandler(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def get(self, uri):
         lpath = local_path(uri)
         protocol, remote_root, level_up_path = host_info(self.request, request_path(uri))
-
-        def graph_json():
-            if 'new' in self.request.arguments:
-                return ""
-            try:
-                with open(lpath) as data_file:
-                    data = json.load(data_file, encoding=data_file.encoding)
-            except EnvironmentError:
-                raise tornado.web.HTTPError(404)
-            return data
-
         self.render("graph.html", lpath=lpath, protocol=protocol, root=remote_root, uri=clean_uri(uri),
-                    level_up_path=level_up_path, data=graph_json(), request=self.request, file_name=uri_parse(uri)[1])
+                    level_up_path=level_up_path, request=self.request, file_name=uri_parse(uri)[1])

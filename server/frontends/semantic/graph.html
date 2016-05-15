@@ -7,10 +7,10 @@
 
 <div class="ui top inverted menu">
         <a class="item" id="uiMenuToggle"><i class="fa fa-list"></i>&nbsp;Menu</a>
-        <a class="item" href="{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}/"><span class="fa fa-folder-open-o"></span>&nbsp;To folder</a>
+        <a class="item" href="{{protocol}}://{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span>&nbsp;To folder</a>
         <a class="item" data-action="model:save"><span class="fa fa-save"></span>&nbsp;Save</a>
         <a class="item" data-action="model:solve"><span class="fa fa-play"></span>&nbsp;Solve All</a>
-        <a class="item" href="{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span>&nbsp;Servers</a>
+        <a class="item" href="{{protocol}}://{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span>&nbsp;Servers</a>
         <div class="item"><h3>{{lpath}}</h3></div>
 </div>
 
@@ -26,7 +26,7 @@
         <table class="ui celled table">
         <tbody>
         <tr>
-           <td><span class="fa fa-code-fork"></span> {{data}}</td>
+           <td><span class="fa fa-code-fork"></span></td>
         </tr>
         <tr>
            <td><span class="fa fa-code-fork"></span> <div class="ui label" id="el_file_contents"></div></td>

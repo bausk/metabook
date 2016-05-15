@@ -41,7 +41,8 @@ class Application(tornado.web.Application):
 
         handlers = [
             (r"/" + metabook_config.routes.tree, metabook.routes.RedirectHandler),
-            (r"/" + metabook_config.routes.tree + r"(/.*)+", metabook.routes.MainHandler, dict(init=0)),
+            (r"/" + metabook_config.routes.tree + r"(/^/+)+", metabook.routes.RedirectHandler),
+            (r"/" + metabook_config.routes.tree + r"(/.+)*/", metabook.routes.MainHandler, dict(init=0)),
             (r"/" + metabook_config.routes.graph + r"/(.*)", metabook.routes.GraphHandler),
             (r"/" + metabook_config.routes.graph + r"/\?new", metabook.routes.GraphHandler),
             (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.file.FileHandler),
