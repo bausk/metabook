@@ -21,25 +21,25 @@ init_jointjs = function(metabook_model) {
   elems_list = [];
   links_list = [];
   cells = metabook_model.get("cells");
-  links = metabook_model.get("metadata").metabook.links;
+  links = metabook_model.get("links");
   cells.each(function(cell_model) {
-    var content, id, metadata, node, source;
+    var content, id, node, position, source;
     source = cell_model.get('source');
-    metadata = cell_model.get('metadata');
-    id = metadata.metabook.id;
+    id = cell_model.id;
     if (typeof source !== "string") {
       content = source.join("");
     } else {
       content = source;
     }
+    position = cell_model.get('position');
     node = new joint.shapes.html.Node({
       id: id,
       position: {
-        x: metadata.metabook.position.x,
-        y: metadata.metabook.position.y
+        x: position.x,
+        y: position.y
       },
       content: content,
-      footing_content: "ipynb cell [" + (cell_model.get('execution_count')) + "]",
+      footing_content: "[ipynb cell]",
       node_markup: {
         node_viewer: '<div class="node_viewer python" data-metabook="true"></div>',
         node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
@@ -50,8 +50,8 @@ init_jointjs = function(metabook_model) {
         'min-width': 250,
         'max-width': 500
       },
-      inPorts: metadata.metabook.inPorts,
-      outPorts: metadata.metabook.outPorts
+      inPorts: cell_model.get('inPorts'),
+      outPorts: cell_model.get('outPorts')
     }, {
       cell_model: cell_model
     });

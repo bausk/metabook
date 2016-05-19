@@ -3,6 +3,8 @@
 # Context menu taken from
 # https://github.com/callmenick/Custom-Context-Menu
 
+metabook.ui = {}
+
 ContextMenu = {
 
     ###

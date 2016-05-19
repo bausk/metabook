@@ -1,4 +1,6 @@
-class metabook.api.Session
+metabook.connect = {}
+
+class metabook.connect.Session
 
     constructor: (url) ->
         @id = joint.util.uuid()
@@ -10,13 +12,13 @@ class metabook.api.Session
         #@listenTo Backbone, 'node:data_session', @run_cell
 
     onopen: (evt) ->
-        alert(evt)
+        console.log('<connection onopen>')
 
     run_cell: (node_view, event) ->
         # accepts Node view.
         # node_view.model = Node model
         # node_view.model.cell_model = Cell model, of Metabook collection
-        msg = new metabook.messages.Message(
+        msg = new metabook.connect.Message(
             session: @id
             msg_type: "run_cell"
             content:
@@ -25,34 +27,17 @@ class metabook.api.Session
         @ws.send(msg.serialize())
 
     solve_all: (metabook_model, event) ->
-        cells = _.map(
-            metabook_model.get('cells').models,
-            (cell) ->
-                result = {}
-                result.id = cell.attributes.metadata.metabook.id
-                result.source = cell.attributes.source
-                result.inPorts = cell.attributes.metadata.metabook.inPorts
-                result.outPorts = cell.attributes.metadata.metabook.outPorts
-                return result
-        )
-        links = _.map(
-            metabook_model.get('metadata').metabook.links.models,
-            (link) ->
-                result = {}
-                result.id = link.attributes.id
-                result.target = link.attributes.target
-                result.source = link.attributes.source
-                return result
-        )
-        msg = new metabook.messages.Message(
+        cells = metabook_model.data.get_cells()
+        links = metabook_model.data.get_links()
+
+        msg = new metabook.connect.Message(
             session: @id
             msg_type: "solve_all"
             content: {cells, links}
         )
 
         @ws.send(msg.serialize())
-        alert "k, " + msg
-
+        console.log "solve_all: " + @id
 
 
     onmessage: (evt) ->
@@ -65,7 +50,7 @@ class metabook.api.Session
         'run' : @prototype.run_cell
 
 
-class metabook.messages.Message
+class metabook.connect.Message
     constructor: ({session, msg_type, @header, @parent_header, @metadata, @content}) ->
         @header ?= @defaults.header()
         @header.session = session

@@ -14,6 +14,11 @@ def clean_uri(uri: str):
 def local_path(uri: str) -> str:
     return os.path.abspath(options.path + "/" + request_path(uri))
 
+def path_to_template(path=None):
+    if path is None:
+        return local_path(config.routes.files.default_template)
+    else:
+        return local_path(path)
 
 def host_info(request, path) -> tuple:
     protocol = request.protocol

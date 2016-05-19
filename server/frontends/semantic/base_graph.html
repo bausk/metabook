@@ -33,30 +33,35 @@
 <script src="/static/joint/lodash.min.js"></script>
 <script src="/static/joint/backbone.js"></script>
 <script src="/static/joint/joint.js"></script>
-<script src="/static/js/selection.js"></script>
 <script src="/static/joint/joint.shapes.devs.js"></script>
 <script src="/static/joint/highlight.pack.js"></script>
 <script src="/static/semantic/semantic.js"></script>
 
 
 <!--<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>-->
+<script src="/static/js/setup.js"></script>
+<script src="/static/js/data.js"></script>
 <script src="/static/js/metabook.js"></script>
-<script src="/static/js/api.js"></script>
-<script src="/static/js/session.js"></script>
+<script src="/static/js/selection.js"></script>
+<script src="/static/js/util.js"></script>
+<script src="/static/js/convert.js"></script>
+<script src="/static/js/connect.js"></script>
 <script src="/static/js/ui.js"></script>
 <script src="/static/js/elements.js"></script>
 <script src="/static/js/node.js"></script>
 <script src="/static/js/graph_jointjs.js"></script>
 <script src="/static/js/graph.js"></script>
 <script language="JavaScript">
-    metabook.api.protocol = "{{protocol}}";
-    metabook.api.root = "{{protocol}}://{{root}}";
-    metabook.api.template_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.template}}/";
-    metabook.api.solvers_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.solvers}}/";
-    metabook.api.sessions_endpoint = "{{root}}/{{metabook_config.routes.api.sessions}}";
-    metabook.api.file.endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.file}}/";
-    metabook.api.file.path = "{{uri}}";
-    metabook.api.file.name = "{{file_name}}";
+    metabook.uri = {}
+    metabook.uri.file = {}
+    metabook.uri.protocol = "{{protocol}}";
+    metabook.uri.root = "{{protocol}}://{{root}}";
+    metabook.uri.template_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.template}}/";
+    metabook.uri.solvers_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.solvers}}/";
+    metabook.uri.sessions_endpoint = "{{root}}/{{metabook_config.routes.api.sessions}}";
+    metabook.uri.file.endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.file}}/";
+    metabook.uri.file.path = "{{uri}}";
+    metabook.uri.file.name = "{{file_name}}";
 </script>
 
 {% end %}

@@ -24,96 +24,21 @@ Settings = {
 };
 
 $(document).ready(function() {
-  var WebSocketTest, counter, data_uri, makeCounter, messageContainer;
-  WebSocketTest = void 0;
-  messageContainer = $(Settings.id.messages);
-  WebSocketTest = function(ev) {
-    var ws;
-    messageContainer.text("WebSocket is supported by your Browser!");
-    ws = new WebSocket("ws://" + window.location.host + "/api/sessions/guise?Id=123456789");
-    ws.onopen = function() {
-      $('#bSend').on("click", function() {
-        return ws.send("New message");
-      });
-      $('#bClose').on("click", function(ev) {
-        ws.close();
-        $(messageContainer).text("Connection is forcefully closed");
-        $(ev.target).addClass("disabled");
-        $('#bSend').addClass("disabled");
-        return $('#bConnect').removeClass("disabled");
-      });
-      $('#bClose').removeClass("disabled");
-      $('#bSend').removeClass("disabled");
-      return $(ev.target).addClass("disabled");
-    };
-    ws.onmessage = function(evt) {
-      var received_msg;
-      received_msg = evt.data;
-      return $(messageContainer).text("Message is received..." + received_msg);
-    };
-    return ws.onclose = function() {
-      return $(messageContainer).text("Connection is closed...");
-    };
-  };
-  $('#bConnect').on("click", WebSocketTest);
-  makeCounter = function() {
-    var count;
-    count = 0;
-    return {
-      increment: function() {
-        return count++;
-      },
-      getCount: function() {
-        return count;
-      }
-    };
-  };
-  counter = makeCounter();
-  $('#bTest1').on("click", function() {
-    counter.increment();
-    return alert(counter.getCount());
-  });
   $("#id2").dimmer({
     closable: false
   }).dimmer('show');
-  data_uri = (function() {
-    if (metabook.options["new"] === true) {
-      if (metabook.api.file.name === "") {
-        return metabook.api.template_endpoint;
-      } else {
-        return metabook.api.file.endpoint + metabook.api.file.path;
-      }
-    } else {
-      return metabook.api.file.endpoint + metabook.api.file.path;
-    }
-  })();
-  return metabook.api.get_ajax_data(data_uri, _.partial(init_graph, {}), error_graph);
+  return metabook.data.get_xhr(metabook.uri.file.endpoint + metabook.uri.file.path).done(function(file_json) {
+    return init_graph(file_json);
+  }).fail(error_graph);
 });
 
-init_graph = function(template, ajax_data) {
-  var create_from, menuview, notebook, paper, uivent;
-  create_from = "";
-  if (!metabook.api.is_good_form(ajax_data)) {
-    if (Object.keys(template).length === 0) {
-      metabook.api.get_ajax_data(metabook.api.template_endpoint, _.partial(init_graph, _, ajax_data), error_graph);
-      return;
-    } else {
-      create_from = "ipynb";
-    }
-  } else {
-    if (metabook.api.is_good_form(template)) {
-      create_from = "ipynb";
-    } else {
-      create_from = "native";
-    }
-  }
+init_graph = function(json_graph) {
+  var menuview, notebook, paper, uivent;
   notebook = new metabook.models.MetabookModel({}, {
-    json: ajax_data,
-    create_from: create_from,
-    template: template
+    json_graph: json_graph
   });
   paper = init_jointjs(notebook);
-  notebook.session = new metabook.api.Session(metabook.api.sessions_endpoint);
+  notebook.session = new metabook.connect.Session(metabook.uri.sessions_endpoint);
   $("#id2").dimmer('hide');
   $("#uiLeftSidebar").sidebar({
     context: $('#id2')
