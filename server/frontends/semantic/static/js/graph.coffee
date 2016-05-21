@@ -1,14 +1,4 @@
-Settings =
-    active_menu_class: "context-menu--active"
-    context_menu:
-        ".element": "#context-menu"
-        "svg": "#context-menu2"
-    ui:
-        actions:
-            "Add": metabook.ui.add
-            "Edit": metabook.ui.edit
-            "Delete": metabook.ui.delete
-    id:
+Settings.id =
         messages: "#messages"
         coords: "#coords"
         graph_container: "#paper_holder"

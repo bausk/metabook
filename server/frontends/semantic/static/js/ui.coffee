@@ -1,4 +1,8 @@
-
+Settings.active_menu_class = "context-menu--active"
+Settings.context_menu =
+        ".element": "#context-menu"
+        "svg": "#context-menu2"
+Settings.ui = {}
 #
 # Context menu taken from
 # https://github.com/callmenick/Custom-Context-Menu
@@ -109,19 +113,6 @@ ContextMenu = {
 
 }
 
-metabook.ui.add = (e) ->
-    alert("add")
-    # @ is paper,
-    # @model.metabook is the MetaBook model object
-
-metabook.ui.edit = (e) ->
-    alert("edit")
-
-metabook.ui.delete = (e) ->
-    alert("delete" + e.pageX)
-
-metabook.ui.save = (e) ->
-    alert('save')
 
 ### TODO DEPRECATE THIS SHIT
 $("[data-action]").click( (evt) ->
