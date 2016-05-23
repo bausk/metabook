@@ -7,6 +7,7 @@ custom_shapes = []
 init_jointjs = (metabook_model) ->
     paper_holder = $(Settings.id.graph_container)
     graph = new metabook.MetaGraph({}, metabook_model)
+
     mainpaper = new GraphPaper({
         el: $(Settings.id.paper),
         width: paper_holder.width(),
@@ -81,3 +82,8 @@ jointjs_attach_events = (paper, graph) ->
     selectionView = new joint.ui.SelectionView({ paper: paper, graph: graph, model: selection })
     paper.on('blank:pointerdown', selectionView.startSelecting)
 
+    paper.on('blank:contextmenu', (e) ->
+        custom_event = "ui:blankmenu"
+        Backbone.trigger custom_event, e
+        console.log "<#{custom_event}> paper event"
+    )

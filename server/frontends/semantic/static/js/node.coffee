@@ -51,7 +51,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
             content: 'Click to edit code'
             footing_content: 'Version A4D3E453'
             node_markup:
-                    head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label"><span class="fa fa-close"></span></label></span>'
+                    head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>'
                     node_viewer: '<div class="node_viewer"></div>'
                     node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
                     footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
@@ -62,8 +62,9 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
 
             @cell_model = data.cell_model
             @on('change:content', _.bind((() ->
-                    #alert('small model change!')
+                    console.log('<change:content>')
                     @cell_model.update_data(this)
+
                 ), this)
             )
 
@@ -236,7 +237,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         return (evt) ->
             custom_event = @dataset.action
             Backbone.trigger custom_event, self, evt
-            console.log "event triggered раз"
+            console.log "<#{custom_event}>"
 
     render: ->
         @processPorts()
@@ -248,7 +249,10 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         # TODO: After render, reformat columns to accomodate ports correctly
         # TODO: establish event listeners for model->change:in/outPorts
 
-
+        #TODO: bind context menu
+        # trigger add event
+        Backbone.trigger "ui:add", @
+        console.log "<ui:add>"
         return this
 
     ###    update: ->

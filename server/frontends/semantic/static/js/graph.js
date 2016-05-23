@@ -20,6 +20,10 @@ $(document).ready(function() {
 
 init_graph = function(json_graph) {
   var menuview, notebook, paper, uivent;
+  uivent = new metabook.ui.Vent();
+  uivent.register({
+    'ui': metabook.ui
+  });
   notebook = new metabook.models.MetabookModel({}, {
     json_graph: json_graph
   });
@@ -33,8 +37,6 @@ init_graph = function(json_graph) {
   $("#uiLeftSidebar").sidebar('setting', 'dimPage', false);
   $("#uiLeftSidebar").sidebar('attach events', '#uiMenuToggle');
   $("#uiLeftSidebar").sidebar('setting', 'closable', false);
-  ContextMenu.init(Settings);
-  uivent = new metabook.ui.Vent();
   uivent.register({
     'session': notebook.session,
     'model': notebook
@@ -51,7 +53,7 @@ init_graph = function(json_graph) {
    */
   jointjs_attach_events(paper, paper.model);
   return menuview = new metabook.views.MenuView({
-    el: $(".menu"),
+    el: $("#metabook_top_menu"),
     model: notebook
   });
 };

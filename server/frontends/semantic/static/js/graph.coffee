@@ -16,6 +16,9 @@ $(document).ready ->
 
 init_graph = (json_graph) ->
 
+    uivent = new metabook.ui.Vent()
+    uivent.register({'ui': metabook.ui})
+
     notebook = new metabook.models.MetabookModel({}, {json_graph})
 
     paper = init_jointjs(notebook)
@@ -33,9 +36,9 @@ init_graph = (json_graph) ->
     $("#uiLeftSidebar").sidebar('setting', 'closable', false)
 
     #attach context menu events
-    ContextMenu.init(Settings)
+    #ContextMenu.init(Settings)
 
-    uivent = new metabook.ui.Vent()
+
     uivent.register({'session' : notebook.session, 'model' : notebook})
 
     # TODO: DEPRECATE THIS SHIT
@@ -53,7 +56,7 @@ init_graph = (json_graph) ->
 
 
     menuview = new metabook.views.MenuView(
-        el: $ ".menu"
+        el: $ "#metabook_top_menu"
         model: notebook
     )
 

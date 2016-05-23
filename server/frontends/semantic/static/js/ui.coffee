@@ -9,6 +9,105 @@ Settings.ui = {}
 
 metabook.ui = {}
 
+metabook.ui.settings =
+    active_menu_class: "context-menu--active"
+    selector: "#context-menu"
+    context_bindings:
+        ".element": "#context-menu"
+        "svg": "#context-menu2"
+    templates:
+        node: """<a href="#" class="item" data-action="node:properties"><i class="fa fa-tasks"></i> Properties <div class="ui small inverted label">Ctrl+Enter</div></a>
+        <a href="#" class="item" data-action="node:run"><i class="fa fa-play"></i> Run Node <div class="ui small inverted label">Ctrl+E</div></a>
+        <a href="#" class="item" data-action="node:update"><i class="fa fa-exchange"></i> Sync to Server <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="node:expand"><i class="fa fa-expand"></i> Expand & Edit <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="node:duplicate"><i class="fa fa-copy"></i> Duplicate <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="node:similar"><i class="fa fa-plus"></i> Select Similar <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="node:delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>
+        """
+        blank: """<a href="#" class="item" data-action="node:save"><i class="fa fa-eye"></i> New node <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="notebook:save"><i class="fa fa-edit"></i> Run <div class="ui small inverted label">Ctrl+E</div></a>
+        <a href="#" class="item" data-action="Delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>"""
+
+metabook.ui.bind_context_menus = () ->
+    for selector, menu_id of metabook.ui.settings.context_bindings
+        @context_listener.apply @, [selector, menu_id]
+
+metabook.ui.custom_events = {
+    'add': (cell) ->
+        cell.$box.on( 'contextmenu', _.partialRight( (e, cell) ->
+            # TODO suppress default, create view
+            e.preventDefault()
+            menu = new metabook.ui.ContextMenuView(cell.model, {cell: cell, event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.node})
+        , cell)
+        )
+    'blankmenu': (e) ->
+        e.preventDefault()
+        menu = new metabook.ui.ContextMenuView({}, {event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.blank})
+}
+
+class metabook.ui.ContextMenuView extends Backbone.View
+
+    initialize: (model, settings) ->
+        @active_menu_class = settings.class
+        @template = settings.template
+        @el = $ settings.selector
+        @event = settings.event
+        @model = model
+        @cell = settings.cell
+        Backbone.View.prototype.initialize.apply(@, arguments)
+        @render()
+
+    render: ->
+        @el.html(@template)
+        @el.addClass(@active_menu_class)
+        @position_active_menu(@event)
+        document.addEventListener("click", @hide)
+        $(Settings.id.paper).on 'mousewheel', @hide
+        window.onresize = @hide
+        window.onkeyup = (e) =>
+            if e.keyCode == 27
+                @hide()
+        @el.on "click [data-action]", (ev) =>
+            @el.off('click [data-action]')
+            custom_event = ev.target.dataset.action
+            Backbone.trigger custom_event, @model, ev
+            console.log "#{custom_event} element event triggered"
+            @hide()
+
+    hide: =>
+        @el.removeClass(@active_menu_class)
+        @remove()
+        @unbind()
+
+    position_active_menu: (e) =>
+        {x, y} = @getPosition(e)
+        menuWidth = @el.offsetWidth + 4
+        menuHeight = @el.offsetHeight + 4
+        windowWidth = window.innerWidth
+        windowHeight = window.innerHeight
+        if windowWidth - x < menuWidth
+            @el.css('left', windowWidth - menuWidth + 'px')
+        else
+            @el.css('left', x + 'px')
+        if windowHeight - y < menuHeight
+            @el.css('top', windowHeight - menuHeight + 'px')
+        else
+            @el.css('top', y + 'px')
+        return
+
+    getPosition: (e) =>
+        posx = 0
+        posy = 0
+        e ?= window.event
+        if e.pageX
+            posx = e.pageX
+            posy = e.pageY
+        else
+            posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
+            posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop
+        { x: posx, y: posy - 12 }
+
+
 ContextMenu = {
 
     ###
@@ -112,19 +211,6 @@ ContextMenu = {
         return
 
 }
-
-
-### TODO DEPRECATE THIS SHIT
-$("[data-action]").click( (evt) ->
-    action = $(this).data('action')
-    if Settings.ui.actions.hasOwnProperty(action)
-        Settings.ui.actions[action](evt)
-)
-
-###
-
-# fucking black sorcery right here
-
 
 class metabook.ui.Vent #extends Backbone.Events
     constructor: ->

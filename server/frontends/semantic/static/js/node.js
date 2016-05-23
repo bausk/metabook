@@ -81,7 +81,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
     content: 'Click to edit code',
     footing_content: 'Version A4D3E453',
     node_markup: {
-      head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label"><span class="fa fa-close"></span></label></span>',
+      head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>',
       node_viewer: '<div class="node_viewer"></div>',
       node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>',
       footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
@@ -90,6 +90,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
   initialize: function(attrs, data) {
     this.cell_model = data.cell_model;
     this.on('change:content', _.bind((function() {
+      console.log('<change:content>');
       return this.cell_model.update_data(this);
     }), this));
     this.on('change:position', _.bind((function() {
@@ -212,7 +213,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
       var custom_event;
       custom_event = this.dataset.action;
       Backbone.trigger(custom_event, self, evt);
-      return console.log("event triggered раз");
+      return console.log("<" + custom_event + ">");
     };
   },
   render: function() {
@@ -223,6 +224,8 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
     }
     this.updateBox();
     this.isrendered = true;
+    Backbone.trigger("ui:add", this);
+    console.log("<ui:add>");
     return this;
   },
 

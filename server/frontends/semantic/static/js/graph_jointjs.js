@@ -78,7 +78,13 @@ jointjs_attach_events = function(paper, graph) {
     graph: graph,
     model: selection
   });
-  return paper.on('blank:pointerdown', selectionView.startSelecting);
+  paper.on('blank:pointerdown', selectionView.startSelecting);
+  return paper.on('blank:contextmenu', function(e) {
+    var custom_event;
+    custom_event = "ui:blankmenu";
+    Backbone.trigger(custom_event, e);
+    return console.log("<" + custom_event + "> paper event");
+  });
 };
 
 //# sourceMappingURL=graph_jointjs.js.map
