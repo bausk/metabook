@@ -53,6 +53,7 @@ def open_new_file(path: str, filename: str = None):
 def convert_default(data):
     if type(data) is str:
         data = json.loads(data)
+    # TODO from data json,
     try:
         del data['id']
     except KeyError:

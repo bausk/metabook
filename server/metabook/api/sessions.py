@@ -85,6 +85,8 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         result = self.solver.run_cell(code)
         return ReplyMessage(solver, result)
 
+
+
     def solve_all(self, message):
         links = message.content.links
         cells = message.content.cells

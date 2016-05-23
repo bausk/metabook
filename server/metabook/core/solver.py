@@ -12,8 +12,8 @@ class Context(OrderedDict):
 
 class MetabookShell(InteractiveShell):
     pass
-    #def enable_gui(self, gui=None):
-    #    return True
+    def enable_gui(self, gui=None):
+        return True
 
 class IPythonSolver(object):
 
@@ -21,19 +21,21 @@ class IPythonSolver(object):
         self.shell = MetabookShell()
         self.queue = set()
         self.results = {}
-        self.cells = {}
+        self.cells_hash = {}
 
     def run_cell(self, code):
+        if type(code) is list:
+            code = "".join(code)
         result = self.shell.run_cell(code)
         return result
 
     def reset(self):
-        self.cells = {}
+        self.cells_hash = {}
         self.shell.reset()
 
     def run_stateful_cell(self, cell_id, context):
 
-        cell = self.cells[cell_id]
+        cell = self.cells_hash[cell_id]
 
         specific_context = context["in:locals"]
         assert isinstance(specific_context, dict)
@@ -69,7 +71,7 @@ class IPythonSolver(object):
             cell['inPorts'] = {port: {} for port in cell['inPorts']}
             cell['evaluated'] = False
             cell['resolved'] = False
-            self.cells[cell['id']] = DotMap(cell)
+            self.cells_hash[cell['id']] = DotMap(cell)
             self.queue.add(cell['id'])
 
         for link in links:
@@ -77,9 +79,9 @@ class IPythonSolver(object):
             source_port = link['source']['port']
             target_id = link['target']['id']
             target_port = link['target']['port']
-            assert isinstance(self.cells[source_id].outPorts[source_port], dict)
-            self.cells[source_id].outPorts[source_port][target_id] = target_port
-            self.cells[target_id].inPorts[target_port][source_id] = source_port
+            assert isinstance(self.cells_hash[source_id].outPorts[source_port], dict)
+            self.cells_hash[source_id].outPorts[source_port][target_id] = target_port
+            self.cells_hash[target_id].inPorts[target_port][source_id] = source_port
             print(target_id)
 
         # TODO Start with arbitrary point on graph.
@@ -97,10 +99,11 @@ class IPythonSolver(object):
 
     def resolve_cell(self, cell_id):
         cell_input = {}
-        cell = self.cells[cell_id]
+        cell = self.cells_hash[cell_id]
         for port_name, port in cell.inPorts.iteritems():
             cell_input[port_name] = self.resolve_port(port)
         # From here, all ports are recursively resolved
+
         result = self.run_stateful_cell(cell_id, context=cell_input)
         self.results[cell_id] = result
         cell.evaluated = True
@@ -112,7 +115,7 @@ class IPythonSolver(object):
         port_output = {}
         if port:
             for source_id, source_port in port.iteritems():
-                if self.cells[source_id].evaluated is False:
+                if self.cells_hash[source_id].evaluated is False:
                     port_output[source_id] = self.resolve_cell(source_id)[source_port]
                 else:
                     port_output[source_id] = self.results[source_id][source_port]

@@ -16,17 +16,17 @@ metabook.ui.settings =
         ".element": "#context-menu"
         "svg": "#context-menu2"
     templates:
-        node: """<a href="#" class="item" data-action="node:properties"><i class="fa fa-tasks"></i> Properties <div class="ui small inverted label">Ctrl+Enter</div></a>
-        <a href="#" class="item" data-action="node:run"><i class="fa fa-play"></i> Run Node <div class="ui small inverted label">Ctrl+E</div></a>
-        <a href="#" class="item" data-action="node:update"><i class="fa fa-exchange"></i> Sync to Server <div class="ui small inverted label">Ctrl+D</div></a>
-        <a href="#" class="item" data-action="node:expand"><i class="fa fa-expand"></i> Expand & Edit <div class="ui small inverted label">Ctrl+D</div></a>
-        <a href="#" class="item" data-action="node:duplicate"><i class="fa fa-copy"></i> Duplicate <div class="ui small inverted label">Ctrl+D</div></a>
-        <a href="#" class="item" data-action="node:similar"><i class="fa fa-plus"></i> Select Similar <div class="ui small inverted label">Ctrl+D</div></a>
-        <a href="#" class="item" data-action="node:delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>
+        node: """<a href="#" class="item" data-action="graph:node:properties"><i class="fa fa-tasks"></i> Properties <div class="ui small inverted label">Ctrl+Enter</div></a>
+        <a href="#" class="item" data-action="session:run"><i class="fa fa-play"></i> Run Node <div class="ui small inverted label">Ctrl+E</div></a>
+        <a href="#" class="item" data-action="graph:node:update"><i class="fa fa-exchange"></i> Sync to Server <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="graph:node:expand"><i class="fa fa-expand"></i> Expand & Edit <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="graph:node:duplicate"><i class="fa fa-copy"></i> Duplicate <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="graph:node:similar"><i class="fa fa-plus"></i> Select Similar <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="graph:node:delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>
         """
-        blank: """<a href="#" class="item" data-action="node:save"><i class="fa fa-eye"></i> New node <div class="ui small inverted label">Ctrl+D</div></a>
-        <a href="#" class="item" data-action="notebook:save"><i class="fa fa-edit"></i> Run <div class="ui small inverted label">Ctrl+E</div></a>
-        <a href="#" class="item" data-action="Delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>"""
+        blank: """<a href="#" class="item" data-action="graph:newnode"><i class="fa fa-eye"></i> New node <div class="ui small inverted label">Ctrl+D</div></a>
+        <a href="#" class="item" data-action="model:solve"><i class="fa fa-edit"></i> Run <div class="ui small inverted label">Ctrl+E</div></a>
+        <a href="#" class="item" data-action="graph:node:delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>"""
 
 metabook.ui.bind_context_menus = () ->
     for selector, menu_id of metabook.ui.settings.context_bindings
@@ -70,7 +70,7 @@ class metabook.ui.ContextMenuView extends Backbone.View
         @el.on "click [data-action]", (ev) =>
             @el.off('click [data-action]')
             custom_event = ev.target.dataset.action
-            Backbone.trigger custom_event, @model, ev
+            metabook.ui.Vent.vent custom_event, @model, ev
             console.log "#{custom_event} element event triggered"
             @hide()
 
@@ -221,4 +221,19 @@ class metabook.ui.Vent #extends Backbone.Events
         for eventclass, handler of handlers
            for eventname, event_handler of handler['custom_events']
                @listenTo Backbone, eventclass + ":" + eventname, _.bind(event_handler, handler)
+    @vent: (custom_event) ->
+        tokens = custom_event.split(':')
+        primary = tokens.slice(0,2).join(':')
+        secondary = tokens.slice(2).join(':')
+        args = [].slice.call(arguments, 1)
+        if secondary != ""
+            args.unshift(secondary)
+        args.unshift(primary)
+        Backbone.trigger.apply(Backbone, args)
+
+    @passover: () ->
+        args = [].slice.call(arguments, 2)
+        event_name = arguments[0]
+        obj = arguments[1]
+        obj.custom_events[event_name].apply(obj, args)
 

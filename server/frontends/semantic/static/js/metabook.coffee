@@ -68,7 +68,7 @@ class metabook.models.MetabookModel extends Backbone.Model
         'solve': (caller, ev) ->
             @session.solve_all(@, ev)
 
-    data = {
+    data: {
         get_cells: _.partial(metabook.data.get_cells, @)
         get_links: _.partial(metabook.data.get_links, @)
     }

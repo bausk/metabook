@@ -39,7 +39,7 @@ init_graph = (json_graph) ->
     #ContextMenu.init(Settings)
 
 
-    uivent.register({'session' : notebook.session, 'model' : notebook})
+    uivent.register({'session' : notebook.session, 'model' : notebook, 'graph' : paper.model})
 
     # TODO: DEPRECATE THIS SHIT
     ###

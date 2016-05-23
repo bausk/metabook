@@ -14,7 +14,7 @@ class metabook.connect.Session
     onopen: (evt) ->
         console.log('<connection onopen>')
 
-    run_cell: (node_view, event) ->
+    run_cell: (node_model, event) ->
         # accepts Node view.
         # node_view.model = Node model
         # node_view.model.cell_model = Cell model, of Metabook collection
@@ -22,13 +22,13 @@ class metabook.connect.Session
             session: @id
             msg_type: "run_cell"
             content:
-                code: node_view.model.get('content')
+                code: node_model.cell_model.get('source')
         )
         @ws.send(msg.serialize())
 
     solve_all: (metabook_model, event) ->
-        cells = metabook_model.data.get_cells()
-        links = metabook_model.data.get_links()
+        cells = metabook.data.get_cells(metabook_model)
+        links = metabook.data.get_links(metabook_model)
 
         msg = new metabook.connect.Message(
             session: @id

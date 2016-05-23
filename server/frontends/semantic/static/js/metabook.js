@@ -76,8 +76,6 @@ metabook.models.LinkCollection = (function(superClass) {
 })(Backbone.Collection);
 
 metabook.models.MetabookModel = (function(superClass) {
-  var data;
-
   extend(MetabookModel, superClass);
 
   function MetabookModel() {
@@ -132,7 +130,7 @@ metabook.models.MetabookModel = (function(superClass) {
     }
   };
 
-  data = {
+  MetabookModel.prototype.data = {
     get_cells: _.partial(metabook.data.get_cells, MetabookModel),
     get_links: _.partial(metabook.data.get_links, MetabookModel)
   };

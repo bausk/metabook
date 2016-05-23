@@ -15,6 +15,7 @@ init_jointjs = (metabook_model) ->
         model: graph,
         gridSize: 1
         defaultLink: new joint.shapes.html.Link
+        linkPinning: false
     })
 
     # 1. obj is our input.

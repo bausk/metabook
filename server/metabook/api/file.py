@@ -51,20 +51,13 @@ class FileHandler(tornado.web.RequestHandler):
         # get formatter by id, if no formatter, create one from data
         #
         path, filename = uri_parse(uri)
-        data_json = json.loads(self.request.body.decode('utf-8'))
-        id = data_json['id']
 
-        try:
-            formatter = self.application.formatters[id]
-        except KeyError:
-            raise tornado.web.HTTPError(500)
-        data = formatter.update_from_wire(data_json)
+        data = self.data_from_request()
 
         try:
             data_file, filename = open_new_file(local_path(path), filename)
             with data_file:
                 new_name = filename
-                # data_json['metadata']['metabook']['id'] = new_id
                 data_file.write(convert_default(data))
         except EnvironmentError:
             raise tornado.web.HTTPError(500)
@@ -72,13 +65,22 @@ class FileHandler(tornado.web.RequestHandler):
             {"success": True,
              "new_name": new_name,
              "new_path": path + filename,
-             # "new_id": new_id,
              }
         )
 
+    def data_from_request(self):
+        data_json = json.loads(self.request.body.decode('utf-8'))
+        try:
+            formatter = self.application.formatters[data_json['id']]
+        except KeyError:
+            raise tornado.web.HTTPError(500)
+        return formatter.update_from_wire(data_json)
+
     @tornado.gen.coroutine
     def put(self, uri):
-        data = self.request.body.decode('utf-8')
+
+        data = self.data_from_request()
+
         try:
             with open(local_path(uri), "w") as data_file:
                 data_file.write(convert_default(data))

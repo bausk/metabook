@@ -58,11 +58,11 @@ metabook.data.is_native = function(file_json) {
 };
 
 metabook.data.get_cells = function(metabook_model) {
-  return metabook_model.get('cells');
+  return metabook_model.get('cells').models;
 };
 
 metabook.data.get_links = function(metabook_model) {
-  return metabook_model.get('links');
+  return metabook_model.get('links').models;
 };
 
 //# sourceMappingURL=data.js.map

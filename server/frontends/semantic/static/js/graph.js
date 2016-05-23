@@ -39,7 +39,8 @@ init_graph = function(json_graph) {
   $("#uiLeftSidebar").sidebar('setting', 'closable', false);
   uivent.register({
     'session': notebook.session,
-    'model': notebook
+    'model': notebook,
+    'graph': paper.model
   });
 
   /*

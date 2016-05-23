@@ -2,12 +2,28 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-metabook.MetaGraph = joint.dia.Graph.extend({
-  initialize: function(attrs, data) {
+metabook.MetaGraph = (function(superClass) {
+  extend(MetaGraph, superClass);
+
+  function MetaGraph() {
+    return MetaGraph.__super__.constructor.apply(this, arguments);
+  }
+
+  MetaGraph.prototype.initialize = function(attrs, data) {
     this.metabook = data;
     return this.constructor.__super__.initialize.apply(this, arguments);
-  }
-});
+  };
+
+  MetaGraph.prototype.custom_events = {
+    "node": metabook.ui.Vent.passover,
+    "newnode": function(ev) {
+      return console.log("<graph:newnode>");
+    }
+  };
+
+  return MetaGraph;
+
+})(joint.dia.Graph);
 
 joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.shapes.basic.PortsModelInterface, {
   markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
@@ -81,7 +97,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
     content: 'Click to edit code',
     footing_content: 'Version A4D3E453',
     node_markup: {
-      head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>',
+      head: '<span class="content_head">Code Cell: FGFDG3456FGDFE</span>',
       node_viewer: '<div class="node_viewer"></div>',
       node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>',
       footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
@@ -124,6 +140,11 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
       attrs[portSelector]['ref-dx'] = 0;
     }
     return attrs;
+  },
+  custom_events: {
+    properties: function() {
+      return console.log("properties");
+    }
   }
 }));
 

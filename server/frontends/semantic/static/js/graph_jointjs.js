@@ -16,7 +16,8 @@ init_jointjs = function(metabook_model) {
     height: paper_holder.height(),
     model: graph,
     gridSize: 1,
-    defaultLink: new joint.shapes.html.Link
+    defaultLink: new joint.shapes.html.Link,
+    linkPinning: false
   });
   elems_list = [];
   links_list = [];

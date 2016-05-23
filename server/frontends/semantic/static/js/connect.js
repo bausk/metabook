@@ -14,13 +14,13 @@ metabook.connect.Session = (function() {
     return console.log('<connection onopen>');
   };
 
-  Session.prototype.run_cell = function(node_view, event) {
+  Session.prototype.run_cell = function(node_model, event) {
     var msg;
     msg = new metabook.connect.Message({
       session: this.id,
       msg_type: "run_cell",
       content: {
-        code: node_view.model.get('content')
+        code: node_model.cell_model.get('source')
       }
     });
     return this.ws.send(msg.serialize());
@@ -28,8 +28,8 @@ metabook.connect.Session = (function() {
 
   Session.prototype.solve_all = function(metabook_model, event) {
     var cells, links, msg;
-    cells = metabook_model.data.get_cells();
-    links = metabook_model.data.get_links();
+    cells = metabook.data.get_cells(metabook_model);
+    links = metabook.data.get_links(metabook_model);
     msg = new metabook.connect.Message({
       session: this.id,
       msg_type: "solve_all",
