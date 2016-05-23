@@ -1,10 +1,14 @@
 
 
-metabook.MetaGraph = joint.dia.Graph.extend(
+class metabook.MetaGraph extends joint.dia.Graph
     initialize: (attrs, data) ->
         @metabook = data
         @constructor.__super__.initialize.apply(this, arguments)
-    )
+    custom_events:
+        "node": metabook.ui.Vent.passover
+        "newnode": (ev) ->
+            console.log("<graph:newnode>")
+
 
 joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
     joint.shapes.basic.PortsModelInterface,
@@ -51,7 +55,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
             content: 'Click to edit code'
             footing_content: 'Version A4D3E453'
             node_markup:
-                    head: '<span class="content_head">Code Cell: FGFDG3456FGDFE<label data-action="session:run" class="ui very small label btn_close"><span class="fa fa-close"></span></label></span>'
+                    head: '<span class="content_head">Code Cell: FGFDG3456FGDFE</span>'
                     node_viewer: '<div class="node_viewer"></div>'
                     node_editor: '<span class="ui form node_editor"><textarea class="node_coupled"></textarea></span>'
                     footing: '<span class="ui small label content_footing" style="font-family: monospace">Python file</span>'
@@ -83,21 +87,25 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
 
 
         getPortAttrs: (portName, index, total, selector, type) ->
-          attrs = {}
-          portClass = 'port' + index
-          portSelector = selector + '>.' + portClass
-          portLabelSelector = portSelector + '>.port-label'
-          portBodySelector = portSelector + '>.port-body'
+            attrs = {}
+            portClass = 'port' + index
+            portSelector = selector + '>.' + portClass
+            portLabelSelector = portSelector + '>.port-label'
+            portBodySelector = portSelector + '>.port-body'
 
-          attrs[portLabelSelector] = {text: portName}
-          attrs[portBodySelector] =
-              port:
-                  id: portName || _.uniqueId(type)
-                  type: type
-          attrs[portSelector] = {ref: '.body', 'ref-y': (39 / 38 + 0.5 + index) / (39 / 38 + total)}
-          if selector is '.outPorts'
-              attrs[portSelector]['ref-dx'] = 0
-          return attrs
+            attrs[portLabelSelector] = {text: portName}
+            attrs[portBodySelector] =
+                port:
+                    id: portName || _.uniqueId(type)
+                    type: type
+            attrs[portSelector] = {ref: '.body', 'ref-y': (39 / 38 + 0.5 + index) / (39 / 38 + total)}
+            if selector is '.outPorts'
+                attrs[portSelector]['ref-dx'] = 0
+            return attrs
+
+        custom_events:
+            properties: () ->
+                console.log("properties")
     )
 )
 
