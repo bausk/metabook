@@ -85,6 +85,5 @@ jointjs_attach_events = (paper, graph) ->
 
     paper.on('blank:contextmenu', (e) ->
         custom_event = "ui:blankmenu"
-        Backbone.trigger custom_event, e
-        console.log "<#{custom_event}> paper event"
+        metabook.ui.Vent.vent custom_event, @, e
     )

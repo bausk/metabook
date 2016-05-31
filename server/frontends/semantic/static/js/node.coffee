@@ -65,7 +65,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
         initialize: (attrs, data) ->
 
             @cell_model = data.cell_model
-            @on('change:content', _.bind((() ->
+            @on('change:attrs', _.bind((() ->
                     console.log('<change:content>')
                     @cell_model.update_data(this)
 

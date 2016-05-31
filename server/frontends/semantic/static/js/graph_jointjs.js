@@ -83,8 +83,7 @@ jointjs_attach_events = function(paper, graph) {
   return paper.on('blank:contextmenu', function(e) {
     var custom_event;
     custom_event = "ui:blankmenu";
-    Backbone.trigger(custom_event, e);
-    return console.log("<" + custom_event + "> paper event");
+    return metabook.ui.Vent.vent(custom_event, this, e);
   });
 };
 

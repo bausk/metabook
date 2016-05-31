@@ -61,6 +61,16 @@ metabook.data.get_cells = function(metabook_model) {
   return metabook_model.get('cells').models;
 };
 
+metabook.data.get_ids = function(cells) {
+  var cell, i, ids, len;
+  ids = [];
+  for (i = 0, len = cells.length; i < len; i++) {
+    cell = cells[i];
+    ids.push(cell.id);
+  }
+  return ids;
+};
+
 metabook.data.get_links = function(metabook_model) {
   return metabook_model.get('links').models;
 };

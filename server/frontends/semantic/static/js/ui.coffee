@@ -40,9 +40,9 @@ metabook.ui.custom_events = {
             menu = new metabook.ui.ContextMenuView(cell.model, {cell: cell, event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.node})
         , cell)
         )
-    'blankmenu': (e) ->
+    'blankmenu': (paper, e) ->
         e.preventDefault()
-        menu = new metabook.ui.ContextMenuView({}, {event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.blank})
+        menu = new metabook.ui.ContextMenuView(paper.model, {event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.blank})
 }
 
 class metabook.ui.ContextMenuView extends Backbone.View

@@ -2,9 +2,9 @@ metabook.connect = {}
 
 class metabook.connect.Session
 
-    constructor: (url) ->
+    constructor: (url, notebook_id) ->
         @id = joint.util.uuid()
-        @ws = new WebSocket("ws://" + url + @id)
+        @ws = new WebSocket("ws://" + url + @id + "?notebook_id=" + notebook_id)
         @ws.onopen = @onopen
         @ws.onmessage = @onmessage
         @ws.onclose = @onclose
@@ -18,22 +18,24 @@ class metabook.connect.Session
         # accepts Node view.
         # node_view.model = Node model
         # node_view.model.cell_model = Cell model, of Metabook collection
+        cells = metabook.data.get_cells(node_model.graph.metabook)
+        links = metabook.data.get_links(node_model.graph.metabook)
+        ids = [node_model.id]
         msg = new metabook.connect.Message(
             session: @id
-            msg_type: "run_cell"
-            content:
-                code: node_model.cell_model.get('source')
+            msg_type: "update"
+            content: {cells, links, ids}
         )
         @ws.send(msg.serialize())
 
     solve_all: (metabook_model, event) ->
         cells = metabook.data.get_cells(metabook_model)
         links = metabook.data.get_links(metabook_model)
-
+        ids = metabook.data.get_ids(cells)
         msg = new metabook.connect.Message(
             session: @id
-            msg_type: "solve_all"
-            content: {cells, links}
+            msg_type: "solve"
+            content: {cells, links, ids}
         )
 
         @ws.send(msg.serialize())

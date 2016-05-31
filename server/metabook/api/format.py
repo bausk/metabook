@@ -25,36 +25,46 @@ class FileFormatter:
         self.newfile = kwargs['newfile']
         self.format = fmt
         self.data = kwargs['data']
-        self.cells_index = {}
+        self._cells_index = {}
         self.template = {}
-        self._wire_data = {}
+        self.wire_data = {}
 
     def id(self):
-        return self._wire_data['id'] if 'id' in self._wire_data else self.data['metadata']['metabook']['id']
+        return self.wire_data['id'] if 'id' in self.wire_data else self.data['metadata']['metabook']['id']
 
     def get_data(self):
         return self.formatters[self.format]()
 
     def update_from_wire(self, wire_data):
-        self._wire_data.update(wire_data)
+        self.wire_data.update(wire_data)
         self._to_native_ipynb()
         return self.data
 
+    def get_cell_table(self):
+        return self._cells_index
+
+    def set_cell_table(self, data):
+        self._cells_index.clear()
+        self._cells_index.update(data)
+
+    def add_cell_table(self, data):
+        self._cells_index.update(data)
+
     def _to_native_ipynb(self):
-        self.data['metadata']['metabook']['id'] = self._wire_data['id']
-        self.data['metadata']['metabook']['links'] = self._wire_data['links']
-        self.data['metadata']['metabook']['tabs'] = self._wire_data['tabs']
+        self.data['metadata']['metabook']['id'] = self.wire_data['id']
+        self.data['metadata']['metabook']['links'] = self.wire_data['links']
+        self.data['metadata']['metabook']['tabs'] = self.wire_data['tabs']
 
         self.data['cells'] = []
 
         new_ipynb_cells = {}
-        for cell in self._wire_data['cells']:
+        for cell in self.wire_data['cells']:
             assert isinstance(cell, dict)
             parsed_cell = cell.copy()
-            ipynb_cell = self.cells_index[cell['id']]
+            ipynb_cell = self._cells_index[cell['id']]
             cell_id = cell['id']
             if cell['cell_type'] == 'code':
-                cell['outputs'] = self._wire_data['results'][cell_id]
+                cell['outputs'] = self.wire_data['results'][cell_id]
             else:
                 try:
                     del cell['outputs']
@@ -68,7 +78,7 @@ class FileFormatter:
             new_ipynb_cells[cell_id] = ipynb_cell
             self.data['cells'].append(ipynb_cell)
 
-        self.cells_index = new_ipynb_cells
+        self.set_cell_table(new_ipynb_cells)
 
     def _from_import_ipynb(self):
         try:
@@ -128,29 +138,29 @@ class FileFormatter:
 
     def _from_native_ipynb(self):
 
-        self._wire_data['cells'] = []
-        self._wire_data['results'] = {}
-        self.cells_index = {}
+        self.wire_data['cells'] = []
+        self.wire_data['results'] = {}
+        self.set_cell_table({})
         for cell in self.data['cells']:
             if self.newfile:
                 cell['metadata']['metabook']['id'] = str(uuid.uuid4())
             cell_id = cell['metadata']['metabook']['id']
-            self._wire_data['results'][cell_id] = cell['outputs'] if cell['cell_type'] == 'code' else {}
-            self._wire_data['cells'].append(
+            self.wire_data['results'][cell_id] = cell['outputs'] if cell['cell_type'] == 'code' else {}
+            self.wire_data['cells'].append(
                 {
                     'source': cell['source'],
                     **cell['metadata']['metabook'],
                     'cell_type': cell['cell_type']
                 }
             )
-            self.cells_index[cell_id] = cell
+            self.add_cell_table({cell_id: cell})
 
-        self._wire_data['links'] = self.data['metadata']['metabook']['links']
-        self._wire_data['tabs'] = {}
-        self._wire_data['id'] = str(uuid.uuid4()) if self.newfile else self.data['metadata']['metabook']['id']
+        self.wire_data['links'] = self.data['metadata']['metabook']['links']
+        self.wire_data['tabs'] = {}
+        self.wire_data['id'] = str(uuid.uuid4()) if self.newfile else self.data['metadata']['metabook']['id']
 
         # Send dicts in wire format: {cells, links, tabs, results, metadata}
-        return self._wire_data
+        return self.wire_data
 
     def _from_native(self):
         raise NotImplementedError("Native format not implemented yet")

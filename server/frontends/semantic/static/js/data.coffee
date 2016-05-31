@@ -44,5 +44,11 @@ metabook.data.is_native = (file_json) ->
 metabook.data.get_cells = (metabook_model) ->
     return metabook_model.get('cells').models
 
+metabook.data.get_ids = (cells) ->
+    ids = []
+    for cell in cells
+        ids.push(cell.id)
+    return ids
+
 metabook.data.get_links = (metabook_model) ->
     return metabook_model.get('links').models

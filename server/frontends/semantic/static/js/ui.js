@@ -53,10 +53,10 @@ metabook.ui.custom_events = {
       });
     }, cell));
   },
-  'blankmenu': function(e) {
+  'blankmenu': function(paper, e) {
     var menu;
     e.preventDefault();
-    return menu = new metabook.ui.ContextMenuView({}, {
+    return menu = new metabook.ui.ContextMenuView(paper.model, {
       event: e,
       "class": metabook.ui.settings.active_menu_class,
       selector: metabook.ui.settings.selector,

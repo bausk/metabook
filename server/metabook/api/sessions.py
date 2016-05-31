@@ -1,46 +1,7 @@
-import tornado.web
-import tornado.gen
 import tornado.websocket
-import uuid
-from ..core import solver
-from .messages import Message, ReplyMessage
-clients = dict()
-count1 = 0
-count2 = 0
-
-
-class SessionStart(tornado.web.RequestHandler):
-
-    @tornado.gen.coroutine
-    def post(self, uri):
-        """
-        Kranks up a new kernel and starts a new session
-        Starts
-        """
-        # TODO EVERYTHING, this is broken code
-        # 1) figure out path and filename
-        # 2) generate UUID and place it into structured data
-        #
-        path, filename = uri_parse(uri)
-        data_json = json.loads(self.request.body.decode('utf-8'))
-        new_id = str(uuid.uuid4())
-
-        try:
-            data_file, filename = open_new_file(local_path(path), filename)
-            with data_file:
-                new_name = filename
-                data_json['metadata']['metabook']['id'] = new_id
-                data_file.write(convert_default(data_json))
-        except EnvironmentError:
-            raise tornado.web.HTTPError(500)
-        self.write(
-            {"success": True,
-             "new_name": new_name,
-             "new_path": path + filename,
-             "new_id": new_id,
-
-             }
-        )
+from metabook.core import solver
+from dotmap import DotMap
+import json
 
 class SessionHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
@@ -49,8 +10,8 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         self.results = {}
         self.id = ""
         self.handlers = {
-            'run_cell': self.run_cell,
-            'solve_all': self.solve_all
+            'update': self.update_subset,
+            'solve': self.solve_subset,
         }
 
         super().__init__(*args)
@@ -61,14 +22,16 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
     def open(self, *args):
         self.id = args[0]
         self.stream.set_nodelay(True)
+        self.formatter = self.application.formatters[self.request.arguments['notebook_id'][0].decode('utf-8')]
         if self.id not in self.application.solvers:
-            self.application.solvers[self.id] = solver.IPythonSolver()
+            self.application.solvers[self.id] = solver.IPythonSolver(self.formatter)
         self.solver = self.application.solvers[self.id]
+
 
     def on_message(self, message):
         # msg_type of message corresponds to method in self.handlers which normally just map to solver methods
         print("Client %s received a message : %s" % (self.id, message))
-        msg = Message(message)
+        msg = RequestMessage(message)
         identifier = msg.header.msg_type
         if identifier in self.handlers:
             result = self.handlers[identifier](msg)
@@ -77,18 +40,34 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         raise EnvironmentError
 
     def on_close(self):
-        if self.id in clients:
-            del clients[self.id]
+        pass
 
-    def run_cell(self, message):
-        code = message.content.code
-        result = self.solver.run_cell(code)
-        return ReplyMessage(solver, result)
-
-
-
-    def solve_all(self, message):
+    def update_subset(self, message):
         links = message.content.links
         cells = message.content.cells
-        result = self.solver.solve_all(cells, links)
-        return ReplyMessage(self.results, result)
+        ids = message.content.ids
+        result = self.solver.update_cells(cells, links, ids)
+        return ReplyMessage(result)
+
+    def solve_subset(self, message):
+        links = message.content.links
+        cells = message.content.cells
+        ids = message.content.ids
+        result = self.solver.solve(cells, links, ids)
+        return ReplyMessage(result)
+
+
+class Message(object):
+    def stringify(self):
+        return json.dumps(self.__dict__)
+
+
+class RequestMessage(DotMap):
+    def __init__(self, result):
+        super().__init__(json.loads(result))
+
+
+class ReplyMessage(Message):
+
+    def __init__(self, result):
+        self.__dict__.update(result)

@@ -23,17 +23,17 @@ init_graph = (json_graph) ->
 
     paper = init_jointjs(notebook)
 
-    notebook.session = new metabook.connect.Session(metabook.uri.sessions_endpoint)
+    notebook.session = new metabook.connect.Session(metabook.uri.sessions_endpoint, notebook.id)
 
     $("#id2").dimmer('hide')
 
-    $("#uiLeftSidebar").sidebar({context: $('#id2')})
+    $("#bottom_sidebar").sidebar({context: $('#id2')})
 
-    $("#uiLeftSidebar").sidebar('setting', 'transition', 'overlay')
-    $("#uiLeftSidebar").sidebar('setting', 'dimPage', false)
+    $("#bottom_sidebar").sidebar('setting', 'transition', 'overlay')
+    $("#bottom_sidebar").sidebar('setting', 'dimPage', false)
 
-    $("#uiLeftSidebar").sidebar('attach events', '#uiMenuToggle')
-    $("#uiLeftSidebar").sidebar('setting', 'closable', false)
+    $("#bottom_sidebar").sidebar('attach events', '#uiMenuToggle')
+    $("#bottom_sidebar").sidebar('setting', 'closable', false)
 
     #attach context menu events
     #ContextMenu.init(Settings)

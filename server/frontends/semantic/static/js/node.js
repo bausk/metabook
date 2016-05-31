@@ -105,7 +105,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({}, joint.sh
   }, joint.shapes.basic.Generic.prototype.defaults),
   initialize: function(attrs, data) {
     this.cell_model = data.cell_model;
-    this.on('change:content', _.bind((function() {
+    this.on('change:attrs', _.bind((function() {
       console.log('<change:content>');
       return this.cell_model.update_data(this);
     }), this));

@@ -1,4 +1,21 @@
 @font-face {
+  font-family: "PT Sans";
+  src: url('../fonts/PT/PT_Sans-Web-Italic.ttf');
+  src: url('../fonts/PT/PT_Sans-Web-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "PT Sans";
+  src: url('../fonts/PT/PT_Sans-Web-Regular.ttf');
+  src: url('../fonts/PT/PT_Sans-Web-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+@font-face {
   font-family: "Roboto";
   src: url('../fonts/Roboto/roboto-thin-webfont.eot?1423657803');
   src: url('../fonts/Roboto/roboto-thin-webfont.eot?&1423657803#iefix') format('embedded-opentype'), url('../fonts/Roboto/roboto-thin-webfont.woff?1423657803') format('woff'), url('../fonts/Roboto/roboto-thin-webfont.ttf?1423657803') format('truetype');
@@ -281,6 +298,15 @@ tr[data-metabook] th.node_head {
   width: auto;
 }
 
+.ui.column textarea.properties {
+  font-family: monospace;
+  padding: 0.3em 0.3em;
+  white-space: pre;
+  overflow-x: auto;
+  word-wrap: normal;
+  width: 100%;
+}
+
 
 td.node_content:hover {
   background: rgb(231, 228, 255) !important;
@@ -288,4 +314,12 @@ td.node_content:hover {
 
 td .invisible {
   display: none;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: 'Roboto'!important;
+}
+
+.header {
+    font-family: 'Roboto'!important;
 }

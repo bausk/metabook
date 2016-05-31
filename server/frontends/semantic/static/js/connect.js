@@ -2,9 +2,9 @@
 metabook.connect = {};
 
 metabook.connect.Session = (function() {
-  function Session(url) {
+  function Session(url, notebook_id) {
     this.id = joint.util.uuid();
-    this.ws = new WebSocket("ws://" + url + this.id);
+    this.ws = new WebSocket("ws://" + url + this.id + "?notebook_id=" + notebook_id);
     this.ws.onopen = this.onopen;
     this.ws.onmessage = this.onmessage;
     this.ws.onclose = this.onclose;
@@ -15,27 +15,34 @@ metabook.connect.Session = (function() {
   };
 
   Session.prototype.run_cell = function(node_model, event) {
-    var msg;
+    var cells, ids, links, msg;
+    cells = metabook.data.get_cells(node_model.graph.metabook);
+    links = metabook.data.get_links(node_model.graph.metabook);
+    ids = [node_model.id];
     msg = new metabook.connect.Message({
       session: this.id,
-      msg_type: "run_cell",
+      msg_type: "update",
       content: {
-        code: node_model.cell_model.get('source')
+        cells: cells,
+        links: links,
+        ids: ids
       }
     });
     return this.ws.send(msg.serialize());
   };
 
   Session.prototype.solve_all = function(metabook_model, event) {
-    var cells, links, msg;
+    var cells, ids, links, msg;
     cells = metabook.data.get_cells(metabook_model);
     links = metabook.data.get_links(metabook_model);
+    ids = metabook.data.get_ids(cells);
     msg = new metabook.connect.Message({
       session: this.id,
-      msg_type: "solve_all",
+      msg_type: "solve",
       content: {
         cells: cells,
-        links: links
+        links: links,
+        ids: ids
       }
     });
     this.ws.send(msg.serialize());

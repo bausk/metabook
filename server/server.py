@@ -45,10 +45,10 @@ class Application(tornado.web.Application):
             (r"/" + metabook_config.routes.tree + r"(/.+)*/", metabook.routes.MainHandler, dict(init=0)),
             (r"/" + metabook_config.routes.graph + r"/(.*)", metabook.routes.GraphHandler),
             (r"/" + metabook_config.routes.graph + r"/\?new", metabook.routes.GraphHandler),
-            (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.file.FileHandler, {'formatters' : self.formatters}),
+            (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.file.FileHandler, {'formatters': self.formatters}),
             (r"/" + metabook_config.routes.api.template + r"/(.*)", metabook.api.file.TemplateHandler),
             (r"/" + metabook_config.routes.api.solvers + r"/(.*)", metabook.api.file.SolverHandler),
-            (r"/" + metabook_config.routes.api.sessions + r"(.*)", metabook.api.sessions.SessionHandler, {'solvers': self.solvers}),
+            (r"/" + metabook_config.routes.api.sessions + r"(.*)", metabook.api.sessions.SessionHandler, {'solvers': self.solvers, 'formatters': self.formatters}),
             (r"/.*", metabook.routes.RedirectHandler)
 
         ]
