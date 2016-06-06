@@ -5,6 +5,8 @@ Settings.id =
         paper: "#myholder"
         svg: "#v-2"
 
+a = 1
+
 $(document).ready ->
 
     # dim the screen while fetching file data

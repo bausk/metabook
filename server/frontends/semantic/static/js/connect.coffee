@@ -43,7 +43,7 @@ class metabook.connect.Session
 
 
     onmessage: (evt) ->
-        alert(evt)
+        console.log(JSON.parse(evt.data))
 
     onclose: (evt) ->
         alert(evt)
@@ -75,3 +75,4 @@ class metabook.connect.Message
 
     serialize: ->
         JSON.stringify(this)
+
