@@ -1281,7 +1281,6 @@
       }
       return this;
     },
-
     // Add a single event listener to the view's element (or a child element
     // using `selector`). This only works for delegate-able events: not `focus`,
     // `blur`, and not `change`, `submit`, and `reset` in Internet Explorer.
