@@ -81,3 +81,75 @@ class metabook.views.MenuView extends Backbone.View
             custom_event = ev.target.dataset.action
             Backbone.trigger custom_event, @model, ev
             console.log "MenuView event triggered"
+
+class metabook.views.DetailsView extends Backbone.View
+
+    template: """
+        <div class="ui modal" style="top:100px">
+        <div class="header">
+          Node Properties: FACB345
+        </div>
+        <div class="content">
+          <div class="ui form properties">
+            <h4 class="ui dividing header">Type chain: </h4>
+            <h4 class="ui dividing header">Tags: </h4>
+            <div class="ui three column centered divided grid">
+                <div class="row">
+                    <div class="ui four wide column">
+                                  <label>Inputs:</label>
+                    </div>
+                    <div class="ui eight wide column">
+                                  <label>Code:</label><br/>
+                        <textarea class="properties">blehbleh bleh</textarea>
+                    </div>
+                    <div class="ui four wide column">
+                                  <label>Outputs:</label>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui button cancel">Cancel</div>
+          <div class="ui green button ok" style="min-width:200px">OK</div>
+        </div>
+        </div>
+    """
+
+    events:
+        'click .ok': "confirm"
+        'click .cancel': "abort"
+
+    initialize: ({template}) =>
+        @render()
+
+
+    render: =>
+        @$el.html(@template)
+        @$modal = @$el.find('.ui.modal')
+        @$modal.modal(
+            detachable: false
+            closable: false
+        )
+        @$modal.modal('show')
+        @$modal.find('textarea.properties').val(@model.get('content'))
+        @delegateEvents()
+        $('.zombieguard').on("click", @zombieguard)
+
+    confirm: =>
+        @remove()
+
+    abort: =>
+        @remove()
+
+    remove: =>
+        @stopListening()
+        @undelegateEvents()
+        @off()
+        @model.off null, null, @
+        @$modal.modal('hide')
+        @$modal.remove()
+        
+    zombieguard: =>
+        alert(@classname)

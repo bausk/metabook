@@ -65,7 +65,7 @@ joint.shapes.html.Node = joint.shapes.basic.Generic.extend(_.extend({},
         initialize: (attrs, data) ->
 
             @cell_model = data.cell_model
-            @on('change:attrs', _.bind((() ->
+            @on('change', _.bind((() ->
                     console.log('<change:content>')
                     @cell_model.update_data(this)
 
@@ -165,6 +165,8 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         @$box.find('th.node_head').popup()
 
 
+
+
         #Drag behavior
         $(window).on 'mousemove', _.bind(((evt) ->
             if @isdraggable
@@ -182,28 +184,7 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
             @isdraggable = false
         ), this)
 
-
-        #
-        # TODO: Reactions towards different clicks and mouseovers. Examples provided below
-        #
-
-        ###
-        @$box.find('input,select').on('mousedown click', (evt) ->
-            evt.stopPropagation()
-            #alert("yeah")
-            )
-        #// This is an example of reacting on the input change and storing the input data in the cell model.
-        @$box.find('input').on 'change', _.bind(((evt) ->
-            @model.set 'input', $(evt.target).val()
-            return
-        ), this)
-        @$box.find('select').on 'change', _.bind(((evt) ->
-            this.model.set 'select', $(evt.target).val()
-        ), this)
-        @$box.find('select').val(@model.get('select'))
-        ###
         @$box.find('.btn_close').on('click', _.bind(@model.remove, @model))
-
 
         # TODO Normal event dispatch!
         #@$box.find('[data-session]').on('click', _.bind( (evt) ->
@@ -222,13 +203,13 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
         #// Remove the box when the model gets removed from the graph.
         @model.on('remove', @removeBox, this)
 
-
-
         #Why do we need updatebox here?
         #@updateBox()
         custom_shapes.push(this)
 
         @$box.find('.node_content').on('click', _.bind(@startEditInPlace, this))
+
+        @$box.find('.node_head').on('dblclick', _.bind(@showDetails, this))
 
         #@model.on('change', @render, this)
         #@model.on 'change', _.bind(@render, this)
@@ -318,6 +299,14 @@ joint.shapes.html.NodeView = joint.dia.ElementView.extend(_.extend({}, joint.sha
             @model.updatePortsAttrs()
             @render()
         ), this))
+
+    showDetails: (ev) ->
+        ev.stopPropagation()
+        details_modal = new metabook.views.DetailsView(
+            el: $ "#modal_menu"
+            model: @model
+            template: $ "#modal_menu_template"
+            )
 
 
     startEditInPlace: ->

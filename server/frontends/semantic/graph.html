@@ -10,11 +10,12 @@
         <a class="item" href="{{protocol}}://{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span>&nbsp;To folder</a>
         <a class="item" data-action="model:save"><span class="fa fa-save"></span>&nbsp;Save</a>
         <a class="item" data-action="model:solve"><span class="fa fa-play"></span>&nbsp;Solve All</a>
+        <a class="item"><span class="fa fa-play"></span>Zombies!</a>
         <a class="item" href="{{protocol}}://{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span>&nbsp;Servers</a>
         <div class="item"><h3>{{lpath}}</h3></div>
 </div>
 
-<div class="pushable" style="height: 100%; width: 100%; overflow: hidden" id="id2">
+<div class="pushable dimmable" style="height: 100%; width: 100%; overflow: hidden" id="id2">
 
     <div class="ui dimmer">
         <div class="ui text loader">Loading Graph data from {{root}}...</div>
@@ -77,43 +78,10 @@
 
 </div>
 
-
 <div id="context-menu" class="ui vertical borderless menu context-menu">
-
-
 </div>
 
-<div id="modal_menu">
-  <div class="ui modal visible" style="top:100px">
-    <div class="header">
-      Node Properties: FACB345
-    </div>
-    <div class="content">
-      <div class="ui form properties">
-        <h4 class="ui dividing header">Type chain: </h4>
-        <h4 class="ui dividing header">Tags: </h4>
-        <div class="ui three column centered divided grid">
-            <div class="row">
-                <div class="ui four wide column">
-                              <label>Inputs:</label>
-                </div>
-                <div class="ui eight wide column">
-                              <label>Code:</label><br/>
-                    <textarea class="properties">blehbleh bleh</textarea>
-                </div>
-                <div class="ui four wide column">
-                              <label>Outputs:</label>
-                </div>
-            </div>
-
-        </div>
-      </div>
-    </div>
-    <div class="actions">
-      <div class="ui button">Cancel</div>
-      <div class="ui green button">Send</div>
-    </div>
-  </div>
+<div id="modal_menu" class="ui dimmer modals">
 </div>
 
 </body>

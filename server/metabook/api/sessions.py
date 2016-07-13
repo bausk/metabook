@@ -4,6 +4,7 @@ from dotmap import DotMap
 import json
 import jsonpickle
 
+
 class SessionHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
 
@@ -27,7 +28,6 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         if self.id not in self.application.solvers:
             self.application.solvers[self.id] = solver.IPythonSolver(self.formatter)
         self.solver = self.application.solvers[self.id]
-
 
     def on_message(self, message):
         # msg_type of message corresponds to method in self.handlers which normally just map to solver methods
@@ -61,7 +61,7 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
 
 class Message(object):
     def stringify(self):
-        return jsonpickle.dumps(self.__dict__, make_refs=False)
+        return json.dumps(self.__dict__, cls=Encoder)
 
 
 class RequestMessage(DotMap):
@@ -69,12 +69,35 @@ class RequestMessage(DotMap):
         super().__init__(json.loads(result))
 
 
+# Stolen from
+# http://stackoverflow.com/questions/2343535/easiest-way-to-serialize-a-simple-class-object-with-simplejson
+class Encoder(json.JSONEncoder):
+    def default(self, o):
+
+        def _execution_result(v):
+            data = {'error_before_exec': v.error_before_exec,
+                    'error_in_exec': v.error_in_exec,
+                    'execution_count': v.execution_count,
+                    'result': v.result,
+                    'success': v.success
+                    }
+            return jsonpickle.dumps(data)
+
+        types = {
+            'ObjectId': lambda v: str(v),
+            'ExecutionResult': _execution_result
+        }
+        obj_type = type(o).__name__
+        if obj_type in types:
+            return types[obj_type](o)
+        else:
+            return jsonpickle.dumps(o)
 
 
 class ReplyMessage(Message):
     def __init__(self, result):
         self.__dict__.update(result)
         # data = {}
-        #for cell_id, cell_result in result.items():
+        # for cell_id, cell_result in result.items():
         #    for port_id, port_result in cell_result.items():
         #        data[cell_id][port_id] = write_results(port_result)
