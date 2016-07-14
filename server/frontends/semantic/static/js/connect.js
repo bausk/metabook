@@ -50,7 +50,7 @@ metabook.connect.Session = (function() {
   };
 
   Session.prototype.onmessage = function(evt) {
-    return alert(evt);
+    return console.log(JSON.parse(evt.data));
   };
 
   Session.prototype.onclose = function(evt) {
