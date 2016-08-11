@@ -266,6 +266,13 @@ th.node_head:hover {
   min-width:200px;
 }
 
+.node_table {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -ms-user-select: none;
+}
+
 .node_content .content {
 
 }
