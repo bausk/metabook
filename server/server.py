@@ -19,8 +19,8 @@ import tornado.web
 import tornado.websocket
 
 import metabook.api.sessions
-import metabook.api.file
-import metabook.routes
+import metabook.api.ajax
+import metabook.pages
 from metabook.config import metabook_config
 
 # from tornado_json.routes import get_routes
@@ -40,16 +40,16 @@ class Application(tornado.web.Application):
         self.solvers = {}
         self.formatters = {}
         handlers = [
-            (r"/" + metabook_config.routes.tree, metabook.routes.RedirectHandler),
-            (r"/" + metabook_config.routes.tree + r"(/^/+)+", metabook.routes.RedirectHandler),
-            (r"/" + metabook_config.routes.tree + r"(/.+)*/", metabook.routes.TreeHandler, dict(init=0)),
-            (r"/" + metabook_config.routes.graph + r"/(.*)", metabook.routes.GraphHandler),
-            (r"/" + metabook_config.routes.graph + r"/\?new", metabook.routes.NewGraphHandler),
-            (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.file.FileHandler, {'formatters': self.formatters}),
-            (r"/" + metabook_config.routes.api.template + r"/(.*)", metabook.api.file.TemplateHandler),
-            (r"/" + metabook_config.routes.api.solvers + r"/(.*)", metabook.api.file.SolverHandler),
+            (r"/" + metabook_config.routes.tree, metabook.pages.RedirectHandler),
+            (r"/" + metabook_config.routes.tree + r"(/^/+)+", metabook.pages.RedirectHandler),
+            (r"/" + metabook_config.routes.tree + r"(/.+)*/", metabook.pages.TreeHandler, dict(init=0)),
+            (r"/" + metabook_config.routes.graph + r"/(.*)", metabook.pages.GraphHandler),
+            (r"/" + metabook_config.routes.graph + r"/\?new", metabook.pages.NewGraphHandler),
+            (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.ajax.FileHandler, {'formatters': self.formatters}),
+            (r"/" + metabook_config.routes.api.template + r"/(.*)", metabook.api.ajax.TemplateHandler),
+            (r"/" + metabook_config.routes.api.solvers + r"/(.*)", metabook.api.ajax.SolverHandler),
             (r"/" + metabook_config.routes.api.sessions + r"(.*)", metabook.api.sessions.SessionHandler, {'solvers': self.solvers, 'formatters': self.formatters}),
-            (r"/.*", metabook.routes.RedirectHandler)
+            (r"/.*", metabook.pages.RedirectHandler)
 
         ]
 

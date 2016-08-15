@@ -43,17 +43,6 @@ init_graph = (json_graph) ->
 
     uivent.register({'session' : notebook.session, 'model' : notebook, 'graph' : paper.model})
 
-    # TODO: DEPRECATE THIS SHIT
-    ###
-    $("[data-action]").on('click', (e) ->
-        action = e.target.dataset.action
-        actions = Settings.ui.actions
-        if `action in actions`
-            ContextMenu.active_menu_off()
-            actions[action].apply(paper, arguments)
-    )
-    ###
-
     jointjs_attach_events(paper, paper.model)
 
 

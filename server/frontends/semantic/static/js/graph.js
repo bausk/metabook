@@ -44,16 +44,6 @@ init_graph = function(json_graph) {
     'model': notebook,
     'graph': paper.model
   });
-
-  /*
-  $("[data-action]").on('click', (e) ->
-      action = e.target.dataset.action
-      actions = Settings.ui.actions
-      if `action in actions`
-          ContextMenu.active_menu_off()
-          actions[action].apply(paper, arguments)
-  )
-   */
   jointjs_attach_events(paper, paper.model);
   return menuview = new metabook.views.MenuView({
     el: $("#metabook_top_menu"),
