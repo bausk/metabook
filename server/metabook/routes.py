@@ -9,7 +9,9 @@ from metabook.config import metabook_config
 import bisect
 
 
-class MainHandler(tornado.web.RequestHandler):
+class TreeHandler(tornado.web.RequestHandler):
+
+
     def initialize(self, init):
         # http://www.tornadoweb.org/en/stable/web.html#entry-points
         self.foo = "Bar " + str(init)
@@ -47,6 +49,16 @@ class RedirectHandler(tornado.web.RequestHandler):
             self.redirect(uri + "/")
 
 class GraphHandler(tornado.web.RequestHandler):
+
+    @tornado.gen.coroutine
+    def get(self, uri):
+        lpath = local_path(uri)
+        protocol, remote_root, level_up_path = host_info(self.request, request_path(uri))
+        self.render("graph.html", lpath=lpath, protocol=protocol, root=remote_root, uri=clean_uri(uri),
+                    level_up_path=level_up_path, request=self.request, file_name=uri_parse(uri)[1])
+
+
+class NewGraphHandler(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def get(self, uri):
         lpath = local_path(uri)
