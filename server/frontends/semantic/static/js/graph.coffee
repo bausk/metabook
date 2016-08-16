@@ -13,7 +13,8 @@ $(document).ready ->
     uivent = new metabook.ui.Vent()
     uivent.register({'ui': metabook.ui})
 
-    global_state = new state4()
+    global_state = new metabook.models.ApplicationState()
+    global_state.set({graph_ready: false})
 
     # dim the screen while fetching file data
     $("#id2").dimmer({closable:false}).dimmer('show')

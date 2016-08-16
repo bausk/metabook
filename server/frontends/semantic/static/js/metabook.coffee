@@ -21,6 +21,15 @@ class metabook.models.LinkModel extends Backbone.Model
     initialize: (attributes, data) ->
     update_data: (graph_link) ->
 
+class metabook.models.ApplicationState extends Backbone.Model
+    initialize: (attributes, data) ->
+        @on('change:graph_ready', @graph_ready, this)
+
+    graph_ready: () ->
+
+    custom_events:
+        
+
 class metabook.models.CellCollection extends Backbone.Collection
     model: metabook.models.CellModel
 

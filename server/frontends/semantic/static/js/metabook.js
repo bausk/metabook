@@ -50,6 +50,25 @@ metabook.models.LinkModel = (function(superClass) {
 
 })(Backbone.Model);
 
+metabook.models.ApplicationState = (function(superClass) {
+  extend(ApplicationState, superClass);
+
+  function ApplicationState() {
+    return ApplicationState.__super__.constructor.apply(this, arguments);
+  }
+
+  ApplicationState.prototype.initialize = function(attributes, data) {
+    return this.on('change:graph_ready', this.graph_ready, this);
+  };
+
+  ApplicationState.prototype.graph_ready = function() {};
+
+  custom_events;
+
+  return ApplicationState;
+
+})(Backbone.Model);
+
 metabook.models.CellCollection = (function(superClass) {
   extend(CellCollection, superClass);
 
