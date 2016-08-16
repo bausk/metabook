@@ -48,7 +48,7 @@ class Application(tornado.web.Application):
             (r"/" + metabook_config.routes.api.file + r"/(.*)", metabook.api.ajax.FileHandler, {'formatters': self.formatters}),
             (r"/" + metabook_config.routes.api.template + r"/(.*)", metabook.api.ajax.TemplateHandler),
             (r"/" + metabook_config.routes.api.solvers + r"/(.*)", metabook.api.ajax.SolverHandler),
-            (r"/" + metabook_config.routes.api.sessions + r"(.*)", metabook.api.sessions.SessionHandler, {'solvers': self.solvers, 'formatters': self.formatters}),
+            (r"/" + metabook_config.routes.api.sessions + r"/(.+)", metabook.api.sessions.SessionHandler, {'solvers': self.solvers, 'formatters': self.formatters}),
             (r"/.*", metabook.pages.RedirectHandler)
 
         ]
