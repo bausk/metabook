@@ -2,17 +2,26 @@ metabook.connect = {}
 
 class metabook.connect.Session
 
-    constructor: (url, notebook_id) ->
+    constructor: (url) ->
         @id = joint.util.uuid()
-        @ws = new WebSocket("ws://" + url + @id + "?notebook_id=" + notebook_id)
+        @ws = new WebSocket("ws://" + url + @id)
         @ws.onopen = @onopen
         @ws.onmessage = @onmessage
         @ws.onclose = @onclose
-        #_.bindAll @, 'run_cell'
-        #@listenTo Backbone, 'node:data_session', @run_cell
 
     onopen: (evt) ->
         console.log('<connection onopen>')
+
+    connect_notebook: (local_path) ->
+        msg = @new_message(type: 'connect notebook')
+        @ws.send(msg.serialize())
+
+    new_message: ({type, content}) ->
+        new metabook.connect.Message(
+            session: @id
+            msg_type: type
+            content: content
+        )
 
     run_cell: (node_model, event) ->
         # accepts Node view.

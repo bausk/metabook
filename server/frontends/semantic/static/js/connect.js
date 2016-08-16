@@ -2,9 +2,9 @@
 metabook.connect = {};
 
 metabook.connect.Session = (function() {
-  function Session(url, notebook_id) {
+  function Session(url) {
     this.id = joint.util.uuid();
-    this.ws = new WebSocket("ws://" + url + this.id + "?notebook_id=" + notebook_id);
+    this.ws = new WebSocket("ws://" + url + this.id);
     this.ws.onopen = this.onopen;
     this.ws.onmessage = this.onmessage;
     this.ws.onclose = this.onclose;
@@ -12,6 +12,24 @@ metabook.connect.Session = (function() {
 
   Session.prototype.onopen = function(evt) {
     return console.log('<connection onopen>');
+  };
+
+  Session.prototype.connect_notebook = function(local_path) {
+    var msg;
+    msg = this.new_message({
+      type: 'connect notebook'
+    });
+    return this.ws.send(msg.serialize());
+  };
+
+  Session.prototype.new_message = function(arg) {
+    var content, type;
+    type = arg.type, content = arg.content;
+    return new metabook.connect.Message({
+      session: this.id,
+      msg_type: type,
+      content: content
+    });
   };
 
   Session.prototype.run_cell = function(node_model, event) {

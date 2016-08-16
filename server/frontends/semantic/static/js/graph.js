@@ -12,20 +12,24 @@ Settings.id = {
 a = 1;
 
 $(document).ready(function() {
+  var global_state, session, uivent;
+  uivent = new metabook.ui.Vent();
+  uivent.register({
+    'ui': metabook.ui
+  });
+  global_state = new state4();
   $("#id2").dimmer({
     closable: false
   }).dimmer('show');
+  session = new metabook.connect.Session(metabook.uri.sessions_endpoint);
+  session.connect_metabook(metabook.uri.file.path, init_graph);
   return metabook.data.get_xhr(metabook.uri.file.endpoint + metabook.uri.file.path).done(function(file_json) {
     return init_graph(file_json);
   }).fail(error_graph);
 });
 
 init_graph = function(json_graph) {
-  var menuview, notebook, paper, uivent;
-  uivent = new metabook.ui.Vent();
-  uivent.register({
-    'ui': metabook.ui
-  });
+  var menuview, notebook, paper;
   notebook = new metabook.models.MetabookModel({}, {
     json_graph: json_graph
   });
