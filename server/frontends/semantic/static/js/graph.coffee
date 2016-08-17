@@ -1,25 +1,22 @@
-Settings.id =
-        messages: "#messages"
-        coords: "#coords"
-        graph_container: "#paper_holder"
-        paper: "#myholder"
-        svg: "#v-2"
 
-a = 1
 
 $(document).ready ->
 
+    imports =
+        ui: require("./ui")
+        connect: require("./connect")
+        data: require("./data")
 
-    uivent = new metabook.ui.Vent()
-    uivent.register({'ui': metabook.ui})
+    uivent = new imports.ui.Vent()
+    uivent.register({'ui': imports.ui})
 
-    global_gui = new metabook.ui.GlobalGUI()
+    global_gui = new imports.ui.GlobalGUI()
 
-    session = new metabook.connect.Session(metabook.uri.sessions_endpoint)
+    session = new imports.connect.Session(config.sessions_endpoint)
 
-    session.connect_metabook(metabook.uri.file.path)
+    session.connect_metabook(config.file.path)
 
-    metabook.data.get_xhr(metabook.uri.file.endpoint + metabook.uri.file.path)
+    imports.data.get_xhr(config.file.endpoint + config.file.path)
         .done( (file_json) -> init_graph(file_json) )
         .fail( error_graph )
 
@@ -31,7 +28,7 @@ init_graph = (json_graph) ->
 
     paper = init_jointjs(notebook)
 
-    notebook.session = new metabook.connect.Session(metabook.uri.sessions_endpoint, notebook.id)
+    notebook.session = new metabook.connect.Session(config.sessions_endpoint, notebook.id)
 
     $("#id2").dimmer('hide')
 

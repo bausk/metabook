@@ -1,7 +1,9 @@
-metabook.models = {}
-metabook.views = {}
+imports =
+    data: require("./data")
+    util: require("./util")
 
-class metabook.models.CellModel extends Backbone.Model
+
+class CellModel extends Backbone.Model
     initialize: (attributes, data) ->
 
     update_data: (graph_cell) ->
@@ -17,11 +19,11 @@ class metabook.models.CellModel extends Backbone.Model
         @set('position', graph_cell.get('position'))
 
 
-class metabook.models.LinkModel extends Backbone.Model
+class LinkModel extends Backbone.Model
     initialize: (attributes, data) ->
     update_data: (graph_link) ->
 
-class metabook.models.ApplicationState extends Backbone.Model
+class ApplicationState extends Backbone.Model
     initialize: (attributes, data) ->
         @on('change:graph_ready', @graph_ready, this)
 
@@ -29,23 +31,23 @@ class metabook.models.ApplicationState extends Backbone.Model
 
 
 
-class metabook.models.CellCollection extends Backbone.Collection
-    model: metabook.models.CellModel
+class CellCollection extends Backbone.Collection
+    model: CellModel
 
-class metabook.models.LinkCollection extends Backbone.Collection
-    model: metabook.models.LinkModel
+class LinkCollection extends Backbone.Collection
+    model: LinkModel
 
 
-class metabook.models.MetabookModel extends Backbone.Model
+class MetabookModel extends Backbone.Model
     initialize: (attributes, {json_graph}) ->
 
-        cell_collection = new metabook.models.CellCollection()
+        cell_collection = new CellCollection()
         for cell in json_graph.cells
-            cell_model = new metabook.models.CellModel(cell)
+            cell_model = new CellModel(cell)
             cell_collection.add(cell_model)
         @set('cells', cell_collection)
 
-        link_collection = new metabook.models.LinkCollection()
+        link_collection = new LinkCollection()
         for link_model in json_graph.links
             link_collection.add(link_model)
 
@@ -59,17 +61,17 @@ class metabook.models.MetabookModel extends Backbone.Model
         'save': (caller, ev) ->
             data = JSON.stringify(this.attributes)
             # data = JSON.stringify(Obj.graph) #just kidding
-            call_type = if metabook.util.get_parameter('new') then 'POST' else 'PUT'
+            call_type = if imports.util.get_parameter('new') then 'POST' else 'PUT'
             $.ajax(
-                url: metabook.uri.file.endpoint + metabook.uri.file.path
+                url: config.file.endpoint + config.file.path
                 type: call_type
                 data: data
                 success: _.bind(((json_data, status, xhr) ->
                     console.log('Succesfully uploaded data')
                     if json_data.new_path
                         history.replaceState(null, null, "/" + json_data.new_path)
-                        metabook.uri.file.path = json_data.new_path
-                        metabook.uri.file.name = json_data.new_name
+                        config.file.path = json_data.new_path
+                        config.file.name = json_data.new_name
                 ), this)
                 error: error_graph
             )
@@ -77,12 +79,12 @@ class metabook.models.MetabookModel extends Backbone.Model
             @session.solve_all(@, ev)
 
     data: {
-        get_cells: _.partial(metabook.data.get_cells, @)
-        get_links: _.partial(metabook.data.get_links, @)
+        get_cells: _.partial(imports.data.get_cells, @)
+        get_links: _.partial(imports.data.get_links, @)
     }
 
 
-class metabook.views.MenuView extends Backbone.View
+class MenuView extends Backbone.View
 
     events:
         "click [data-action]": (ev) ->
@@ -90,7 +92,7 @@ class metabook.views.MenuView extends Backbone.View
             Backbone.trigger custom_event, @model, ev
             console.log "MenuView event triggered"
 
-class metabook.views.DetailsView extends Backbone.View
+class DetailsView extends Backbone.View
 
     template: """
         <div class="ui modal" style="top:100px">
@@ -161,3 +163,7 @@ class metabook.views.DetailsView extends Backbone.View
         
     zombieguard: =>
         alert(@classname)
+
+module.exports =
+    views: {DetailsView, MenuView}
+    models: {CellModel, LinkModel, LinkCollection, CellCollection, ApplicationState, MetabookModel}

@@ -1,6 +1,7 @@
-metabook.connect = {}
+imports =
+    data: require("./data")
 
-class metabook.connect.Session
+class Session
 
     constructor: (url) ->
         @id = joint.util.uuid()
@@ -17,7 +18,7 @@ class metabook.connect.Session
         @ws.send(msg.serialize())
 
     new_message: ({type, content}) ->
-        new metabook.connect.Message(
+        new Message(
             session: @id
             msg_type: type
             content: content
@@ -27,10 +28,10 @@ class metabook.connect.Session
         # accepts Node view.
         # node_view.model = Node model
         # node_view.model.cell_model = Cell model, of Metabook collection
-        cells = metabook.data.get_cells(node_model.graph.metabook)
-        links = metabook.data.get_links(node_model.graph.metabook)
+        cells = importsimports.data.get_cells(node_model.graph.metabook)
+        links = importsimports.data.get_links(node_model.graph.metabook)
         ids = [node_model.id]
-        msg = new metabook.connect.Message(
+        msg = new Message(
             session: @id
             msg_type: "update"
             content: {cells, links, ids}
@@ -38,10 +39,10 @@ class metabook.connect.Session
         @ws.send(msg.serialize())
 
     solve_all: (metabook_model, event) ->
-        cells = metabook.data.get_cells(metabook_model)
-        links = metabook.data.get_links(metabook_model)
-        ids = metabook.data.get_ids(cells)
-        msg = new metabook.connect.Message(
+        cells = imports.data.get_cells(metabook_model)
+        links = imports.data.get_links(metabook_model)
+        ids = imports.data.get_ids(cells)
+        msg = new Message(
             session: @id
             msg_type: "solve"
             content: {cells, links, ids}
@@ -63,7 +64,7 @@ class metabook.connect.Session
         'run' : @prototype.run_cell
 
 
-class metabook.connect.Message
+class Message
     constructor: ({session, msg_type, @header, @parent_header, @metadata, @content}) ->
         @header ?= @defaults.header()
         @header.session = session
@@ -87,4 +88,4 @@ class metabook.connect.Message
     serialize: ->
         JSON.stringify(this)
 
-module.exports = metabook.connect
+module.exports = {Session, Message}

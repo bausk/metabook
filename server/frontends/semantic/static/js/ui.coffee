@@ -1,15 +1,9 @@
-Settings.active_menu_class = "context-menu--active"
-Settings.context_menu =
-        ".element": "#context-menu"
-        "svg": "#context-menu2"
-Settings.ui = {}
-#
 # Context menu taken from
 # https://github.com/callmenick/Custom-Context-Menu
 
-metabook.ui = {}
+Settings = require("./settings")
 
-metabook.ui.settings =
+settings =
     active_menu_class: "context-menu--active"
     selector: "#context-menu"
     context_bindings:
@@ -28,24 +22,24 @@ metabook.ui.settings =
         <a href="#" class="item" data-action="model:solve"><i class="fa fa-edit"></i> Run <div class="ui small inverted label">Ctrl+E</div></a>
         <a href="#" class="item" data-action="graph:node:delete"><i class="fa fa-times"></i> Delete <div class="ui small inverted label">Ctrl+D</div></a>"""
 
-metabook.ui.bind_context_menus = () ->
-    for selector, menu_id of metabook.ui.settings.context_bindings
+bind_context_menus = () ->
+    for selector, menu_id of settings.context_bindings
         @context_listener.apply @, [selector, menu_id]
 
-metabook.ui.custom_events = {
+custom_events = {
     'add': (cell) ->
         cell.$box.on( 'contextmenu', _.partialRight( (e, cell) ->
             # TODO suppress default, create view
             e.preventDefault()
-            menu = new metabook.ui.ContextMenuView(cell.model, {cell: cell, event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.node})
+            menu = new ContextMenuView(cell.model, {cell: cell, event: e, class: settings.active_menu_class, selector: settings.selector, template: settings.templates.node})
         , cell)
         )
     'blankmenu': (paper, e) ->
         e.preventDefault()
-        menu = new metabook.ui.ContextMenuView(paper.model, {event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.blank})
+        menu = new ContextMenuView(paper.model, {event: e, class: settings.active_menu_class, selector: settings.selector, template: settings.templates.blank})
 }
 
-class metabook.ui.GlobalGUI extends Backbone.View
+class GlobalGUI extends Backbone.View
     initialize: ->
         @listenTo Backbone, 'graph:notready', @dim
         @listenTo Backbone, 'graph:ready', @undim
@@ -54,7 +48,7 @@ class metabook.ui.GlobalGUI extends Backbone.View
     undim: ->
         $("#id2").dimmer('hide')
 
-class metabook.ui.ContextMenuView extends Backbone.View
+class ContextMenuView extends Backbone.View
 
     initialize: (model, settings) ->
         @active_menu_class = settings.class
@@ -79,7 +73,7 @@ class metabook.ui.ContextMenuView extends Backbone.View
         @el.on "click [data-action]", (ev) =>
             @el.off('click [data-action]')
             custom_event = ev.target.dataset.action
-            metabook.ui.Vent.vent custom_event, @model, ev
+            Vent.vent custom_event, @model, ev
             console.log "#{custom_event} element event triggered"
             @hide()
 
@@ -221,7 +215,7 @@ ContextMenu = {
 
 }
 
-class metabook.ui.Vent #extends Backbone.Events
+class Vent #extends Backbone.Events
     constructor: ->
         _.extend @, Backbone.Events
     register: (handlers) ->
@@ -246,3 +240,4 @@ class metabook.ui.Vent #extends Backbone.Events
         obj = arguments[1]
         obj.custom_events[event_name].apply(obj, args)
 
+module.exports = {bind_context_menus, custom_events, ContextMenuView, ContextMenu, Vent, GlobalGUI}
