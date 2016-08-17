@@ -13,15 +13,11 @@ $(document).ready ->
     uivent = new metabook.ui.Vent()
     uivent.register({'ui': metabook.ui})
 
-    global_state = new metabook.models.ApplicationState()
-    global_state.set({graph_ready: false})
-
-    # dim the screen while fetching file data
-    $("#id2").dimmer({closable:false}).dimmer('show')
+    global_gui = new metabook.ui.GlobalGUI()
 
     session = new metabook.connect.Session(metabook.uri.sessions_endpoint)
 
-    session.connect_metabook(metabook.uri.file.path, init_graph)
+    session.connect_metabook(metabook.uri.file.path)
 
     metabook.data.get_xhr(metabook.uri.file.endpoint + metabook.uri.file.path)
         .done( (file_json) -> init_graph(file_json) )

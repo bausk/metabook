@@ -72,7 +72,8 @@ metabook.connect.Session = (function() {
   };
 
   Session.prototype.onclose = function(evt) {
-    return alert(evt);
+    console.log("<session:closed>");
+    return Backbone.trigger('session:closed', this);
   };
 
   Session.prototype.custom_events = {
@@ -126,5 +127,7 @@ metabook.connect.Message = (function() {
   return Message;
 
 })();
+
+module.exports = metabook.connect;
 
 //# sourceMappingURL=connect.js.map

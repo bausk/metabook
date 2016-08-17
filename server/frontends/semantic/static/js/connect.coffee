@@ -55,7 +55,9 @@ class metabook.connect.Session
         console.log(JSON.parse(evt.data))
 
     onclose: (evt) ->
-        alert(evt)
+        console.log "<session:closed>"
+        Backbone.trigger 'session:closed', @
+
 
     custom_events:
         'run' : @prototype.run_cell
@@ -85,3 +87,4 @@ class metabook.connect.Message
     serialize: ->
         JSON.stringify(this)
 
+module.exports = metabook.connect

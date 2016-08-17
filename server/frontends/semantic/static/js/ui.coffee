@@ -43,9 +43,16 @@ metabook.ui.custom_events = {
     'blankmenu': (paper, e) ->
         e.preventDefault()
         menu = new metabook.ui.ContextMenuView(paper.model, {event: e, class: metabook.ui.settings.active_menu_class, selector: metabook.ui.settings.selector, template: metabook.ui.settings.templates.blank})
-    
-
 }
+
+class metabook.ui.GlobalGUI extends Backbone.View
+    initialize: ->
+        @listenTo Backbone, 'graph:notready', @dim
+        @listenTo Backbone, 'graph:ready', @undim
+    dim: ->
+        $("#id2").dimmer({closable:false}).dimmer('show')
+    undim: ->
+        $("#id2").dimmer('hide')
 
 class metabook.ui.ContextMenuView extends Backbone.View
 
