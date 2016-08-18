@@ -2,13 +2,19 @@
 var Message, Session, imports;
 
 imports = {
-  data: require("./data")
+  data: require("./data"),
+  websocket: require("./websocket")
 };
 
 Session = (function() {
   function Session(url) {
     this.id = joint.util.uuid();
-    this.ws = new WebSocket("ws://" + url + this.id);
+    this.ws = new imports.websocket("ws://" + url + this.id, null, {
+      debug: true,
+      reconnectInterval: 1000,
+      maxReconnectInterval: 30000,
+      reconnectDecay: 1.5
+    });
     this.ws.onopen = this.onopen;
     this.ws.onmessage = this.onmessage;
     this.ws.onclose = this.onclose;

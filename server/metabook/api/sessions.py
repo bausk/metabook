@@ -22,12 +22,12 @@ class SessionHandler(tornado.websocket.WebSocketHandler):
         return True
 
     def open(self, *args):
-        self.id = args[0]
+        """self.id = args[0]
         self.stream.set_nodelay(True)
         self.formatter = self.application.formatters[self.request.arguments['notebook_id'][0].decode('utf-8')]
         if self.id not in self.application.solvers:
             self.application.solvers[self.id] = solver.IPythonSolver(self.formatter)
-        self.solver = self.application.solvers[self.id]
+        self.solver = self.application.solvers[self.id]"""
 
     def on_message(self, message):
         # msg_type of message corresponds to method in self.handlers which normally just map to solver methods

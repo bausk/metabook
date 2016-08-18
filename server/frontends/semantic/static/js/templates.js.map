@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "templates.js",
+  "sourceRoot": "",
+  "sources": [
+    "templates.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA,MAAM,CAAC,OAAP,GACI;EAAA,QAAA,EACI;IAAA,mBAAA,EAAqB,0OAArB;GADJ"
+}

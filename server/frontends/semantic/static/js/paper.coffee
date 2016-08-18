@@ -1,4 +1,4 @@
-joint.shapes.html = {}
+Settings = require("./settings")
 
 GraphPaper = joint.dia.Paper.extend(
 
@@ -130,3 +130,5 @@ GraphPaper = joint.dia.Paper.extend(
         y = pageY / @current_scale + offset.y
         return {x, y}
 )
+
+module.exports = { GraphPaper }

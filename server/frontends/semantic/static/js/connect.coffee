@@ -1,11 +1,12 @@
 imports =
     data: require("./data")
+    websocket: require("./websocket")
 
 class Session
 
     constructor: (url) ->
         @id = joint.util.uuid()
-        @ws = new WebSocket("ws://" + url + @id)
+        @ws = new imports.websocket("ws://" + url + @id, null, {debug: true, reconnectInterval: 1000, maxReconnectInterval: 30000, reconnectDecay: 1.5})
         @ws.onopen = @onopen
         @ws.onmessage = @onmessage
         @ws.onclose = @onclose

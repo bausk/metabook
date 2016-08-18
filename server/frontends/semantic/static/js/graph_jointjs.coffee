@@ -3,6 +3,10 @@
 graphics = {}
 custom_shapes = []
 
+joint.shapes.html = {}
+_.extend(joint.shapes.html, require('./node'), require('./nodeview'))
+Settings = require("./settings")
+11
 
 init_jointjs = (metabook_model) ->
     paper_holder = $(Settings.id.graph_container)
@@ -87,3 +91,5 @@ jointjs_attach_events = (paper, graph) ->
         custom_event = "ui:blankmenu"
         metabook.ui.Vent.vent custom_event, @, e
     )
+
+module.exports = { init_jointjs, jointjs_attach_events }
