@@ -9,7 +9,7 @@ $(document).ready ->
         settings: require("./settings")
 
     message = new imports.messages.SessionDisconnectedMessage(el: imports.settings.id.globalmessages)
-    message.show()
+    # message.show()
     uivent = new imports.ui.Vent()
     uivent.register({'ui': imports.ui})
 

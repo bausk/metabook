@@ -12,7 +12,8 @@ class Session
         @ws.onclose = @onclose
 
     onopen: (evt) ->
-        console.log('<connection onopen>')
+        console.log('<connect.js connection:open>')
+        Backbone.trigger "connection:open", @
 
     connect_notebook: (local_path) ->
         msg = @new_message(type: 'connect notebook')
@@ -57,8 +58,8 @@ class Session
         console.log(JSON.parse(evt.data))
 
     onclose: (evt) ->
-        console.log "<session:closed>"
-        Backbone.trigger 'session:closed', @
+        console.log "<connect.js session closed>"
+        Backbone.trigger 'connection:closed', @
 
 
     custom_events:

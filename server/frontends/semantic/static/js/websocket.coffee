@@ -106,8 +106,8 @@
       else
         eventTarget.dispatchEvent generateEvent('connecting')
         @reconnectAttempts = 0
-      Backbone.trigger "session:connecting", @
-      console.log "<session:connecting>"
+      Backbone.trigger "websocket:connecting", @
+      console.log "<websocket:connecting>"
       if self.debug or ReconnectingWebSocket.debugAll
         console.debug 'ReconnectingWebSocket', 'attempt-connect', self.url
       localWs = ws
@@ -152,8 +152,8 @@
               console.debug 'ReconnectingWebSocket', 'onclose', self.url
             eventTarget.dispatchEvent generateEvent('close')
           timeout = self.reconnectInterval * self.reconnectDecay ** self.reconnectAttempts
-          console.log "<session:waiting> " + if timeout > self.maxReconnectInterval then self.maxReconnectInterval else timeout
-          Backbone.trigger "session:waiting", @, if timeout > self.maxReconnectInterval then self.maxReconnectInterval else timeout
+          console.log "<websocket:wait " + if timeout > self.maxReconnectInterval then self.maxReconnectInterval else timeout
+          Backbone.trigger "websocket:wait", @, if timeout > self.maxReconnectInterval then self.maxReconnectInterval else timeout
           setTimeout (->
             self.reconnectAttempts++
             self.open true
@@ -173,8 +173,8 @@
         if self.debug or ReconnectingWebSocket.debugAll
           console.debug 'ReconnectingWebSocket', 'onerror', self.url, event
         eventTarget.dispatchEvent generateEvent('error')
-        Backbone.trigger "connection:error", @
-        console.log "<session:error>"
+        Backbone.trigger "websocket:error", @
+        console.log "websocket:wait"
         return
 
       return
