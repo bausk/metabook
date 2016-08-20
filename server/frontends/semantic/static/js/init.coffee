@@ -8,8 +8,9 @@ $(document).ready ->
         messages: require("./ui_messages")
         settings: require("./settings")
 
+    _.extend(imports, require("./objects")) # imports.models, imports.views
+
     message = new imports.messages.SessionDisconnectedMessage(el: imports.settings.id.globalmessages)
-    # message.show()
     uivent = new imports.ui.Vent()
     uivent.register({'ui': imports.ui})
 
@@ -17,11 +18,13 @@ $(document).ready ->
 
     session = new imports.connect.Session(config.sessions_endpoint)
 
-    session.connect_metabook(config.file.path)
+    notebook = new imports.models.MetabookModel({})
 
-    imports.data.get_xhr(config.file.endpoint + config.file.path)
-        .done( (file_json) -> init_graph(file_json) )
-        .fail( error_graph )
+    notebook.connect(session.connect_file(config.file.path))
+
+    #imports.data.get_xhr(config.file.endpoint + config.file.path)
+    #    .done( (file_json) -> init_graph(file_json) )
+    #    .fail( error_graph )
 
 init_graph = (json_graph) ->
 
@@ -31,9 +34,6 @@ init_graph = (json_graph) ->
 
     paper = init_jointjs(notebook)
 
-    notebook.session = new metabook.connect.Session(config.sessions_endpoint, notebook.id)
-
-    $("#id2").dimmer('hide')
 
     $("#bottom_sidebar").sidebar({context: $('#id2')})
 

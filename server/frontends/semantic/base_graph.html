@@ -57,11 +57,12 @@
     config.file = {};
     config.protocol = "{{protocol}}";
     config.root = "{{protocol}}://{{root}}";
-    config.template_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.template}}/";
+    //config.template_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.template}}/";
     config.solvers_endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.solvers}}/";
     config.sessions_endpoint = "{{root}}/{{metabook_config.routes.api.sessions}}/";
-    config.file.endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.file}}/";
+    //config.file.endpoint = "{{protocol}}://{{root}}/{{metabook_config.routes.api.file}}/";
     config.file.path = "{{uri}}";
+    config.file.query = "{{query}}";
     config.file.name = "{{file_name}}";
 </script>
 <script src="/static/js/metabook.js"></script>

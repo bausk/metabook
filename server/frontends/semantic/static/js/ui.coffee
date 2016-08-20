@@ -41,8 +41,8 @@ custom_events = {
 
 class GlobalGUI extends Backbone.View
     initialize: ->
-        @listenTo Backbone, 'graph:notready', @dim
-        @listenTo Backbone, 'graph:ready', @undim
+        @listenTo Backbone, 'metabook:notready', @dim
+        @listenTo Backbone, 'metabook:ready', @undim
     dim: ->
         $("#id2").dimmer({closable:false}).dimmer('show')
     undim: ->

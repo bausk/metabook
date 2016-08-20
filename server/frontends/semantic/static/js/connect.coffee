@@ -3,8 +3,8 @@ imports =
     websocket: require("./websocket")
 
 class Session
-
     constructor: (url) ->
+        _.extend @, Backbone.Events
         @id = joint.util.uuid()
         @ws = new imports.websocket("ws://" + url + @id, null, {debug: true, reconnectInterval: 1000, maxReconnectInterval: 30000, reconnectDecay: 1.5})
         @ws.onopen = @onopen
@@ -15,12 +15,19 @@ class Session
         console.log('<connect.js connection:open>')
         Backbone.trigger "connection:open", @
 
-    connect_notebook: (local_path) ->
-        msg = @new_message(type: 'connect notebook')
-        @ws.send(msg.serialize())
+    connect_file: (path) ->
+        @file = new Promise( (resolve, reject) =>
+            msg = @new_message(type: 'message:file:connect', content: {path, query:config.file.query})
+            @ws.send(msg.serialize())
+
+            @listenTo Backbone, 'message:file:connected', resolve
+            @listenTo Backbone, 'message:file:error', reject
+
+        )
+        @file
 
     new_message: ({type, content}) ->
-        new Message(
+        Message.new(
             session: @id
             msg_type: type
             content: content
@@ -55,7 +62,8 @@ class Session
 
 
     onmessage: (evt) ->
-        console.log(JSON.parse(evt.data))
+        message = new Message(JSON.parse(evt.data))
+        Backbone.trigger message.header.msg_type, message
 
     onclose: (evt) ->
         console.log "<connect.js session closed>"
@@ -67,15 +75,19 @@ class Session
 
 
 class Message
-    constructor: ({session, msg_type, @header, @parent_header, @metadata, @content}) ->
-        @header ?= @defaults.header()
-        @header.session = session
-        @header.msg_type = msg_type
-        @metadata ?= @defaults.metadata
-        @parent_header ?= @defaults.parent_header
-        @content ?= @defaults.content
+    constructor: ({@header, @parent_header, @metadata, @content}) ->
 
-    defaults:
+    @new: ({session, msg_type, header, parent_header, metadata, content}) ->
+        header ?= @defaults.header()
+        header.session = session
+        header.msg_type = msg_type
+        metadata ?= @defaults.metadata
+        parent_header ?= @defaults.parent_header
+        content ?= @defaults.content
+
+        new Message({header, parent_header, metadata, content})
+
+    @defaults:
         header: ->
             msg_id: joint.util.uuid()
             username: "default"

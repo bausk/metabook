@@ -1,62 +1,125 @@
-import tornado.websocket
+import tornado.websocket, tornado.web
 from metabook.core import solver
+import metabook.api.format as fmt
 from dotmap import DotMap
 import json
 import jsonpickle
+import uuid
+from ..local.files import open_file_as_json
 
 
 class SessionHandler(tornado.websocket.WebSocketHandler):
+    # Handler API:
+    # return content of message. ReplyMessage is formed in on_message
+    #
+    #
     def __init__(self, *args, **kwargs):
 
         self.solver = None
+        self.formatters = kwargs['formatters']
         self.results = {}
         self.id = ""
         self.handlers = {
             'update': self.update_subset,
             'solve': self.solve_subset,
+            'message:file:connect': self.connect_file,
         }
-
+        self.msg_types = {
+            'update': 'update',
+            'solve': 'solve',
+            'message:file:connect': 'file',
+        }
         super().__init__(*args)
 
     def check_origin(self, origin):
         return True
 
     def open(self, *args):
-        """self.id = args[0]
+        """
+
+        :param args: tuple of (<path on server>,...)
+        :return:
+        """
+
+        self.id = args[0]
         self.stream.set_nodelay(True)
-        self.formatter = self.application.formatters[self.request.arguments['notebook_id'][0].decode('utf-8')]
-        if self.id not in self.application.solvers:
-            self.application.solvers[self.id] = solver.IPythonSolver(self.formatter)
-        self.solver = self.application.solvers[self.id]"""
 
     def on_message(self, message):
         # msg_type of message corresponds to method in self.handlers which normally just map to solver methods
         print("Client %s received a message : %s" % (self.id, message))
         msg = RequestMessage(message)
         identifier = msg.header.msg_type
+        # data = ("", "ok")
         if identifier in self.handlers:
-            result = self.handlers[identifier](msg)
-            data = result.stringify()
-            self.write_message(data)
+            try:
+                data = self.handlers[identifier](msg)
+            except:
+                data = ("", "error")
+            # result is message content; form appropriate message and return
+            result = data[0]
+            message_type = data[1]
+            reply = ReplyMessage(
+                parent_header=msg.header,
+                header={
+                    "msg_id": str(uuid.uuid4()),
+                    "username": "default",
+                    "session": self.id,
+                    "date": "",
+                    "msg_type": "message:" + self.msg_types[identifier] + ":" + message_type,
+                    "version": '1'
+                },
+                metadata={},
+                content=result
+            )
+            self.write_message(reply.stringify())
             return
         raise EnvironmentError
 
+    def save_formatter(self, formatter: fmt.FileFormatter):
+        identity = formatter.id()
+        self.formatters[identity] = formatter
+
     def on_close(self):
-        pass
+        if self.id in self.application.solvers:
+            del self.application.solvers[self.id]
+
+    def connect_file(self, message):
+
+        path = message.content.path
+        query = message.content.query
+
+        newfile = True if query == "new" else False
+        try:
+            data_json = open_file_as_json(path, query)
+        except EnvironmentError:
+            raise tornado.web.HTTPError(404)
+
+        my_format = fmt.define_format(data_json)
+        formatter = fmt.FileFormatter(my_format, data=data_json, newfile=newfile)
+        # TODO: figure out this line
+        self.save_formatter(formatter)
+
+        # TODO: connect Ipython solver, what logic?
+        # Right now solver is bound to session id
+        if self.id not in self.application.solvers:
+            self.application.solvers[self.id] = solver.IPythonSolver()
+        self.solver = self.application.solvers[self.id]
+
+        return formatter.get_data(), "connected"
 
     def update_subset(self, message):
         links = message.content.links
         cells = message.content.cells
         ids = message.content.ids
         result = self.solver.update_cells(cells, links, ids)
-        return ReplyMessage(result)
+        return result,
 
     def solve_subset(self, message):
         links = message.content.links
         cells = message.content.cells
         ids = message.content.ids
         result = self.solver.solve(cells, links, ids)
-        return ReplyMessage(result)
+        return result,
 
 
 class Message(object):
@@ -67,6 +130,15 @@ class Message(object):
 class RequestMessage(DotMap):
     def __init__(self, result):
         super().__init__(json.loads(result))
+
+
+class ReplyMessage(Message):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    @classmethod
+    def from_content(self, content):
+        pass
 
 
 # Stolen from
@@ -92,12 +164,3 @@ class Encoder(json.JSONEncoder):
             return types[obj_type](o)
         else:
             return jsonpickle.dumps(o)
-
-
-class ReplyMessage(Message):
-    def __init__(self, result):
-        self.__dict__.update(result)
-        # data = {}
-        # for cell_id, cell_result in result.items():
-        #    for port_id, port_result in cell_result.items():
-        #        data[cell_id][port_id] = write_results(port_result)

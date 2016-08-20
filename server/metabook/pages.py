@@ -54,14 +54,6 @@ class GraphHandler(tornado.web.RequestHandler):
     def get(self, uri):
         lpath = local_path(uri)
         protocol, remote_root, level_up_path = host_info(self.request, request_path(uri))
-        self.render("graph.html", lpath=lpath, protocol=protocol, root=remote_root, uri=clean_uri(uri),
+        self.render("graph.html", lpath=lpath, protocol=protocol, query=self.request.query, root=remote_root, uri=clean_uri(uri),
                     level_up_path=level_up_path, request=self.request, file_name=uri_parse(uri)[1])
 
-
-class NewGraphHandler(tornado.web.RequestHandler):
-    @tornado.gen.coroutine
-    def get(self, uri):
-        lpath = local_path(uri)
-        protocol, remote_root, level_up_path = host_info(self.request, request_path(uri))
-        self.render("graph.html", lpath=lpath, protocol=protocol, root=remote_root, uri=clean_uri(uri),
-                    level_up_path=level_up_path, request=self.request, file_name=uri_parse(uri)[1])

@@ -1,11 +1,21 @@
 import os
 from tornado.options import options
-from urllib import parse
+from urllib.parse import urlparse
 from ..config import metabook_config as config
 import json
 
+
+def open_file_as_json(path: str, query: str): #path is local, relative to notebook root, with URI parameters if any
+    lpath = path_to_template() if query == "new" else local_path(urlparse(path).path)
+
+    with open(lpath) as datafile:
+        data_json = json.load(datafile)
+    return data_json
+
+
 def request_path(uri: str):
     return uri.rstrip('/') if uri else ''
+
 
 def clean_uri(uri: str):
     return uri if uri else ''
@@ -14,11 +24,13 @@ def clean_uri(uri: str):
 def local_path(uri: str) -> str:
     return os.path.abspath(options.path + "/" + request_path(uri))
 
+
 def path_to_template(path=None):
     if path is None:
         return local_path(config.routes.files.default_template)
     else:
         return local_path(path)
+
 
 def host_info(request, path) -> tuple:
     protocol = request.protocol

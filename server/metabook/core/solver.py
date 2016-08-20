@@ -32,11 +32,10 @@ class ExecutionResult:
         pass
 
 class IPythonSolver(object):
-    def __init__(self, formatter: FileFormatter):
+    def __init__(self):
         self.shell = MetabookShell().instance()
         self.queue = set()
         self.results = {}
-        self.formatter = formatter
         self.cells_hash = {}
 
     def run_cell(self, code):
