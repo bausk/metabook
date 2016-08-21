@@ -5,14 +5,19 @@
 
 
 
-<div class="ui top inverted menu" id="metabook_top_menu">
+<div class="ui top menu" id="metabook_top_menu">
         <a class="item" id="uiMenuToggle"><i class="fa fa-list"></i>&nbsp;Menu</a>
         <a class="item" href="{{protocol}}://{{root}}/{{metabook_config.routes.tree}}/{{level_up_path}}"><span class="fa fa-folder-open-o"></span>&nbsp;To folder</a>
         <a class="item" data-action="model:save"><span class="fa fa-save"></span>&nbsp;Save</a>
-        <a class="item" data-action="model:solve"><span class="fa fa-play"></span>&nbsp;Solve All</a>
-        <a class="item"><span class="fa fa-play"></span>Zombies!</a>
+        <a class="disabled item" data-action="model:solve"><span class="fa fa-play"></span>&nbsp;Solve All</a>
         <a class="item" href="{{protocol}}://{{root}}/{{metabook_config.routes.tree}}"><span class="fa fa-gear"></span>&nbsp;Servers</a>
-        <div class="item"><h3>{{lpath}}</h3></div>
+        <a class="item">{{lpath}}</a>
+        <div class = "right labeled icon menu">
+              <a class="item" id="kernelstatus" style="color:black">
+                <i class="asterisk icon"></i>
+                Python 3
+              </a>
+        </div>
 </div>
 
 <div class="pushable dimmable" style="height: 100%; width: 100%; overflow: hidden" id="id2">

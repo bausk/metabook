@@ -22,18 +22,10 @@ $(document).ready ->
 
     notebook.connect(session.connect_file(config.file.path))
 
-    #imports.data.get_xhr(config.file.endpoint + config.file.path)
-    #    .done( (file_json) -> init_graph(file_json) )
-    #    .fail( error_graph )
-
-init_graph = (json_graph) ->
-
-
-
-    notebook = new metabook.models.MetabookModel({}, {json_graph})
-
     paper = init_jointjs(notebook)
 
+
+init_graph = (json_graph) ->
 
     $("#bottom_sidebar").sidebar({context: $('#id2')})
 
@@ -58,8 +50,3 @@ init_graph = (json_graph) ->
     )
 
 
-
-
-error_graph = (e) ->
-    $("#id2").dimmer('hide')
-    alert("Connection error. Check if your backend is running.")

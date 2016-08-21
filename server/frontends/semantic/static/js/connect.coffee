@@ -6,11 +6,13 @@ class Session
     constructor: (url) ->
         _.extend @, Backbone.Events
         @id = joint.util.uuid()
+        @ws = new imports.websocket("ws://" + url + @id, null, {debug: true, reconnectInterval: 1000, maxReconnectInterval: 30000, reconnectDecay: 1.5})
+        @promise_session()
+        @ws.onmessage = @onmessage
 
-        @promise = new Promise( (resolve, reject) =>
-            @ws = new imports.websocket("ws://" + url + @id, null, {debug: true, reconnectInterval: 1000, maxReconnectInterval: 30000, reconnectDecay: 1.5})
+    promise_session: () ->
+        @connected = new Promise( (resolve, reject) =>
             @ws.onopen = _.partial(@onopen, resolve)
-            @ws.onmessage = @onmessage
             @ws.onclose = _.partial(@onclose, reject)
         )
 
@@ -20,7 +22,7 @@ class Session
         resolve()
 
     connect_file: (path) ->
-        return @promise.then( () =>
+        return @connected.then( () =>
             @file = new Promise( (resolve, reject) =>
                 msg = @new_message(type: 'message:file:connect', content: {path, query:config.file.query})
                 @ws.send(msg.serialize())
@@ -70,8 +72,10 @@ class Session
         message = new Message(JSON.parse(evt.data))
         Backbone.trigger message.header.msg_type, message
 
-    onclose: (promise, evt) ->
-        console.log "<connect.js session closed>"
+    onclose: (reject, evt) =>
+        reject()
+        @promise_session()
+        console.log "<connect.js connection closed>"
         Backbone.trigger 'connection:closed', @
 
 

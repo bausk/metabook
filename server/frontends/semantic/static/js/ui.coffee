@@ -41,12 +41,29 @@ custom_events = {
 
 class GlobalGUI extends Backbone.View
     initialize: ->
+        @kernel_status = 'pending'
         @listenTo Backbone, 'metabook:notready', @dim
         @listenTo Backbone, 'message:file:connected', @undim
+        @listenTo Backbone, 'metabook:notready', @kernel_status_disconnected
+        @listenTo Backbone, 'connection:open', @kernel_status_pending
+        @listenTo Backbone, 'connection:closed', @kernel_status_disconnected
+        @listenTo Backbone, 'message:file:kernelstarted', @kernel_status_ok
+
     dim: ->
         $("#id2").dimmer({closable:false}).dimmer('show')
     undim: ->
         $("#id2").dimmer('hide')
+    kernel_status_pending: ->
+        if @kernel_status == 'ok'
+            $("#kernelstatus").css("color", "seagreen")
+        else
+            $("#kernelstatus").css("color", "orange")
+    kernel_status_disconnected: ->
+        $("#kernelstatus").css("color", "red")
+    kernel_status_ok: =>
+        @kernel_status = 'ok'
+        $("#kernelstatus").css("color", "seagreen")
+
 
 class ContextMenuView extends Backbone.View
 
