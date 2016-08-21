@@ -71,6 +71,8 @@ class MetabookModel extends Backbone.Model
             # TODO: handle error
         )
 
+        
+
 
     custom_events:
         'save': (caller, ev) ->

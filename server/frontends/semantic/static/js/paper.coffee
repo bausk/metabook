@@ -131,4 +131,4 @@ GraphPaper = joint.dia.Paper.extend(
         return {x, y}
 )
 
-module.exports = { GraphPaper }
+module.exports = GraphPaper

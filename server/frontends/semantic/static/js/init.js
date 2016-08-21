@@ -2,13 +2,17 @@
 var init_graph;
 
 $(document).ready(function() {
-  var global_gui, imports, message, notebook, paper, session, uivent;
+  var cells, global_gui, graph, imports, links, mainpaper, message, notebook, paper_holder, session, uivent;
+  joint.shapes.html = {};
+  _.extend(joint.shapes.html, require('./node'), require('./nodeview'));
   imports = {
     ui: require("./ui"),
     connect: require("./connect"),
     data: require("./data"),
     messages: require("./ui_messages"),
-    settings: require("./settings")
+    settings: require("./settings"),
+    graph: require("./graph"),
+    paper: require("./paper")
   };
   _.extend(imports, require("./objects"));
   message = new imports.messages.SessionDisconnectedMessage({
@@ -22,7 +26,19 @@ $(document).ready(function() {
   session = new imports.connect.Session(config.sessions_endpoint);
   notebook = new imports.models.MetabookModel({});
   notebook.connect(session.connect_file(config.file.path));
-  return paper = init_jointjs(notebook);
+  graph = new imports.graph({}, notebook);
+  paper_holder = $(imports.settings.id.graph_container);
+  mainpaper = new imports.paper({
+    el: $(imports.settings.id.paper),
+    width: paper_holder.width(),
+    height: paper_holder.height(),
+    model: graph,
+    gridSize: 1,
+    defaultLink: new joint.shapes.html.Link,
+    linkPinning: false
+  });
+  cells = notebook.get("cells");
+  return links = notebook.get("links");
 });
 
 init_graph = function(json_graph) {

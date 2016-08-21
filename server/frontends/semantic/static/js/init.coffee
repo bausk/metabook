@@ -1,12 +1,18 @@
 
 $(document).ready ->
 
+    joint.shapes.html = {}
+    _.extend(joint.shapes.html, require('./node'), require('./nodeview'))
+
+
     imports =
         ui: require("./ui")
         connect: require("./connect")
         data: require("./data")
         messages: require("./ui_messages")
         settings: require("./settings")
+        graph: require("./graph")
+        paper: require("./paper")
 
     _.extend(imports, require("./objects")) # imports.models, imports.views
 
@@ -22,7 +28,22 @@ $(document).ready ->
 
     notebook.connect(session.connect_file(config.file.path))
 
-    paper = init_jointjs(notebook)
+    graph = new imports.graph({}, notebook)
+
+    paper_holder = $(imports.settings.id.graph_container)
+    mainpaper = new imports.paper({
+        el: $(imports.settings.id.paper),
+        width: paper_holder.width(),
+        height: paper_holder.height(),
+        model: graph,
+        gridSize: 1
+        defaultLink: new joint.shapes.html.Link
+        linkPinning: false
+    })
+    cells = notebook.get("cells")
+    links = notebook.get("links")
+
+
 
 
 init_graph = (json_graph) ->
