@@ -42,7 +42,7 @@ custom_events = {
 class GlobalGUI extends Backbone.View
     initialize: ->
         @listenTo Backbone, 'metabook:notready', @dim
-        @listenTo Backbone, 'metabook:ready', @undim
+        @listenTo Backbone, 'message:file:connected', @undim
     dim: ->
         $("#id2").dimmer({closable:false}).dimmer('show')
     undim: ->

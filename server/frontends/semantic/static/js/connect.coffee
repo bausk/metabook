@@ -6,25 +6,30 @@ class Session
     constructor: (url) ->
         _.extend @, Backbone.Events
         @id = joint.util.uuid()
-        @ws = new imports.websocket("ws://" + url + @id, null, {debug: true, reconnectInterval: 1000, maxReconnectInterval: 30000, reconnectDecay: 1.5})
-        @ws.onopen = @onopen
-        @ws.onmessage = @onmessage
-        @ws.onclose = @onclose
 
-    onopen: (evt) ->
+        @promise = new Promise( (resolve, reject) =>
+            @ws = new imports.websocket("ws://" + url + @id, null, {debug: true, reconnectInterval: 1000, maxReconnectInterval: 30000, reconnectDecay: 1.5})
+            @ws.onopen = _.partial(@onopen, resolve)
+            @ws.onmessage = @onmessage
+            @ws.onclose = _.partial(@onclose, reject)
+        )
+
+    onopen: (resolve, evt) ->
         console.log('<connect.js connection:open>')
         Backbone.trigger "connection:open", @
+        resolve()
 
     connect_file: (path) ->
-        @file = new Promise( (resolve, reject) =>
-            msg = @new_message(type: 'message:file:connect', content: {path, query:config.file.query})
-            @ws.send(msg.serialize())
+        return @promise.then( () =>
+            @file = new Promise( (resolve, reject) =>
+                msg = @new_message(type: 'message:file:connect', content: {path, query:config.file.query})
+                @ws.send(msg.serialize())
 
-            @listenTo Backbone, 'message:file:connected', resolve
-            @listenTo Backbone, 'message:file:error', reject
-
+                @listenTo Backbone, 'message:file:connected', resolve
+                @listenTo Backbone, 'message:file:error', reject
+                @file
+            )
         )
-        @file
 
     new_message: ({type, content}) ->
         Message.new(
@@ -65,7 +70,7 @@ class Session
         message = new Message(JSON.parse(evt.data))
         Backbone.trigger message.header.msg_type, message
 
-    onclose: (evt) ->
+    onclose: (promise, evt) ->
         console.log "<connect.js session closed>"
         Backbone.trigger 'connection:closed', @
 
