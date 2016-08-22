@@ -1,4 +1,6 @@
-imports = require('./objects')
+imports =
+    objects: require('./objects')
+    paper: require('./paper')
 
 NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsViewInterface,
     template: [
@@ -94,7 +96,7 @@ NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsVie
 
         #Why do we need updatebox here?
         #@updateBox()
-        custom_shapes.push(this)
+        imports.paper.custom_shapes.push(this)
 
         @$box.find('.node_content').on('click', _.bind(@startEditInPlace, this))
 
@@ -191,7 +193,7 @@ NodeView = joint.dia.ElementView.extend(_.extend({}, joint.shapes.basic.PortsVie
 
     showDetails: (ev) ->
         ev.stopPropagation()
-        details_modal = new imports.views.DetailsView(
+        details_modal = new imports.objects.views.DetailsView(
             el: $ "#modal_menu"
             model: @model
             template: $ "#modal_menu_template"

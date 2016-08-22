@@ -16,9 +16,12 @@ MetaGraph = (function(superClass) {
   }
 
   MetaGraph.prototype.initialize = function(attrs, data) {
-    var cells, elems_list, links, links_list;
     this.metabook = data;
-    this.constructor.__super__.initialize.apply(this, arguments);
+    return this.constructor.__super__.initialize.apply(this, arguments);
+  };
+
+  MetaGraph.prototype.populate = function() {
+    var cells, elems_list, links, links_list;
     elems_list = [];
     links_list = [];
     cells = this.metabook.get("cells");

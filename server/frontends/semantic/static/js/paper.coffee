@@ -1,5 +1,8 @@
 Settings = require("./settings")
 
+graphics = {}
+custom_shapes = []
+
 GraphPaper = joint.dia.Paper.extend(
 
     origin:
@@ -131,4 +134,4 @@ GraphPaper = joint.dia.Paper.extend(
         return {x, y}
 )
 
-module.exports = GraphPaper
+module.exports = {GraphPaper, custom_shapes}

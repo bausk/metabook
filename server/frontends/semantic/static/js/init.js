@@ -30,7 +30,7 @@ $(document).ready(function() {
     notebook.connect(data);
     graph = new imports.graph({}, notebook);
     paper_holder = $(imports.settings.id.graph_container);
-    return mainpaper = new imports.paper({
+    mainpaper = new imports.paper.GraphPaper({
       el: $(imports.settings.id.paper),
       width: paper_holder.width(),
       height: paper_holder.height(),
@@ -39,6 +39,7 @@ $(document).ready(function() {
       defaultLink: new joint.shapes.html.Link,
       linkPinning: false
     });
+    return graph.populate();
   });
 
   /*notebook.connect(session.connect_file(config.file.path))

@@ -15,6 +15,8 @@ class MetaGraph extends joint.dia.Graph
         # file_id: "{% if 'new' in request.arguments %}{% else %}0123456789{% end %}",
         # path: "{{uri}}"
         # 3. branch for new vs saved notebook
+
+    populate: () ->
         elems_list = []
         links_list = []
 

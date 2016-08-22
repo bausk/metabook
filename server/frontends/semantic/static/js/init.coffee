@@ -5,6 +5,7 @@ $(document).ready ->
     _.extend(joint.shapes.html, require('./node'), require('./nodeview'))
 
 
+
     imports =
         ui: require("./ui")
         connect: require("./connect")
@@ -30,7 +31,7 @@ $(document).ready ->
         notebook.connect(data)
         graph = new imports.graph({}, notebook)
         paper_holder = $(imports.settings.id.graph_container)
-        mainpaper = new imports.paper({
+        mainpaper = new imports.paper.GraphPaper({
             el: $(imports.settings.id.paper)
             width: paper_holder.width()
             height: paper_holder.height()
@@ -39,6 +40,7 @@ $(document).ready ->
             defaultLink: new joint.shapes.html.Link
             linkPinning: false
         })
+        graph.populate()
     )
 
     ###notebook.connect(session.connect_file(config.file.path))
