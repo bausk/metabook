@@ -3,6 +3,7 @@ imports =
     util: require("./util")
 
 
+
 class CellModel extends Backbone.Model
     initialize: (attributes, data) ->
 
@@ -48,28 +49,25 @@ class MetabookModel extends Backbone.Model
         Backbone.trigger 'metabook:notready', @
 
 
-    connect: (promised_file) =>
-        promised_file.then( (message) =>
-            cell_collection = @get('cells')
-            json_graph = message.content
-            for cell in json_graph.cells
-                cell_model = new CellModel(cell)
-                cell_collection.add(cell_model)
-            @set('cells', cell_collection)
 
-            link_collection = @get('links')
-            for link_model in json_graph.links
-                link_collection.add(link_model)
+    connect: (message) =>
+        cell_collection = @get('cells')
+        json_graph = message.content
+        for cell in json_graph.cells
+            cell_model = new CellModel(cell)
+            cell_collection.add(cell_model)
+        @set('cells', cell_collection)
 
-            @set('links', link_collection)
+        link_collection = @get('links')
+        for link_model in json_graph.links
+            link_collection.add(link_model)
 
-            @set('tabs', json_graph.tabs)
-            @set('results', json_graph.results)
-            @set('id', json_graph.id)
+        @set('links', link_collection)
 
-        , (message) ->
-            # TODO: handle error
-        )
+        @set('tabs', json_graph.tabs)
+        @set('results', json_graph.results)
+        @set('id', json_graph.id)
+
 
         
 

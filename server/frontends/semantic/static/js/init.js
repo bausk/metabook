@@ -2,7 +2,7 @@
 var init_graph;
 
 $(document).ready(function() {
-  var cells, global_gui, graph, imports, links, mainpaper, message, notebook, paper_holder, session, uivent;
+  var global_gui, imports, message, notebook, session, uivent;
   joint.shapes.html = {};
   _.extend(joint.shapes.html, require('./node'), require('./nodeview'));
   imports = {
@@ -25,20 +25,37 @@ $(document).ready(function() {
   global_gui = new imports.ui.GlobalGUI();
   session = new imports.connect.Session(config.sessions_endpoint);
   notebook = new imports.models.MetabookModel({});
-  notebook.connect(session.connect_file(config.file.path));
-  graph = new imports.graph({}, notebook);
-  paper_holder = $(imports.settings.id.graph_container);
-  mainpaper = new imports.paper({
-    el: $(imports.settings.id.paper),
-    width: paper_holder.width(),
-    height: paper_holder.height(),
-    model: graph,
-    gridSize: 1,
-    defaultLink: new joint.shapes.html.Link,
-    linkPinning: false
+  return session.connect_file(config.file.path).then(function(data) {
+    var graph, mainpaper, paper_holder;
+    notebook.connect(data);
+    graph = new imports.graph({}, notebook);
+    paper_holder = $(imports.settings.id.graph_container);
+    return mainpaper = new imports.paper({
+      el: $(imports.settings.id.paper),
+      width: paper_holder.width(),
+      height: paper_holder.height(),
+      model: graph,
+      gridSize: 1,
+      defaultLink: new joint.shapes.html.Link,
+      linkPinning: false
+    });
   });
-  cells = notebook.get("cells");
-  return links = notebook.get("links");
+
+  /*notebook.connect(session.connect_file(config.file.path))
+  graph = new imports.graph({}, notebook)
+  promise.then(graph.populate)
+  
+  paper_holder = $(imports.settings.id.graph_container)
+  mainpaper = new imports.paper({
+      el: $(imports.settings.id.paper)
+      width: paper_holder.width()
+      height: paper_holder.height()
+      model: graph
+      gridSize: 1
+      defaultLink: new joint.shapes.html.Link
+      linkPinning: false
+  })
+   */
 });
 
 init_graph = function(json_graph) {

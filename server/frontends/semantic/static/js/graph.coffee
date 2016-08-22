@@ -1,4 +1,6 @@
-imports = require('./ui')
+imports = {
+    ui: require('./ui')
+}
 
 class MetaGraph extends joint.dia.Graph
     initialize: (attrs, data) ->
@@ -56,11 +58,7 @@ class MetaGraph extends joint.dia.Graph
             links_list.push(link)
         )
 
-        graph.addCells([elems_list..., links_list...])
-
-
-
-
+        @addCells([elems_list..., links_list...])
 
 
     custom_events:

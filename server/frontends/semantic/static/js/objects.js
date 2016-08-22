@@ -113,31 +113,27 @@ MetabookModel = (function(superClass) {
     return Backbone.trigger('metabook:notready', this);
   };
 
-  MetabookModel.prototype.connect = function(promised_file) {
-    return promised_file.then((function(_this) {
-      return function(message) {
-        var cell, cell_collection, cell_model, i, j, json_graph, len, len1, link_collection, link_model, ref, ref1;
-        cell_collection = _this.get('cells');
-        json_graph = message.content;
-        ref = json_graph.cells;
-        for (i = 0, len = ref.length; i < len; i++) {
-          cell = ref[i];
-          cell_model = new CellModel(cell);
-          cell_collection.add(cell_model);
-        }
-        _this.set('cells', cell_collection);
-        link_collection = _this.get('links');
-        ref1 = json_graph.links;
-        for (j = 0, len1 = ref1.length; j < len1; j++) {
-          link_model = ref1[j];
-          link_collection.add(link_model);
-        }
-        _this.set('links', link_collection);
-        _this.set('tabs', json_graph.tabs);
-        _this.set('results', json_graph.results);
-        return _this.set('id', json_graph.id);
-      };
-    })(this), function(message) {});
+  MetabookModel.prototype.connect = function(message) {
+    var cell, cell_collection, cell_model, i, j, json_graph, len, len1, link_collection, link_model, ref, ref1;
+    cell_collection = this.get('cells');
+    json_graph = message.content;
+    ref = json_graph.cells;
+    for (i = 0, len = ref.length; i < len; i++) {
+      cell = ref[i];
+      cell_model = new CellModel(cell);
+      cell_collection.add(cell_model);
+    }
+    this.set('cells', cell_collection);
+    link_collection = this.get('links');
+    ref1 = json_graph.links;
+    for (j = 0, len1 = ref1.length; j < len1; j++) {
+      link_model = ref1[j];
+      link_collection.add(link_model);
+    }
+    this.set('links', link_collection);
+    this.set('tabs', json_graph.tabs);
+    this.set('results', json_graph.results);
+    return this.set('id', json_graph.id);
   };
 
   MetabookModel.prototype.custom_events = {

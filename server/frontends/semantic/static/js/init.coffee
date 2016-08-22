@@ -26,24 +26,35 @@ $(document).ready ->
 
     notebook = new imports.models.MetabookModel({})
 
-    notebook.connect(session.connect_file(config.file.path))
+    session.connect_file(config.file.path).then( (data) ->
+        notebook.connect(data)
+        graph = new imports.graph({}, notebook)
+        paper_holder = $(imports.settings.id.graph_container)
+        mainpaper = new imports.paper({
+            el: $(imports.settings.id.paper)
+            width: paper_holder.width()
+            height: paper_holder.height()
+            model: graph
+            gridSize: 1
+            defaultLink: new joint.shapes.html.Link
+            linkPinning: false
+        })
+    )
 
+    ###notebook.connect(session.connect_file(config.file.path))
     graph = new imports.graph({}, notebook)
+    promise.then(graph.populate)
 
     paper_holder = $(imports.settings.id.graph_container)
     mainpaper = new imports.paper({
-        el: $(imports.settings.id.paper),
-        width: paper_holder.width(),
-        height: paper_holder.height(),
-        model: graph,
+        el: $(imports.settings.id.paper)
+        width: paper_holder.width()
+        height: paper_holder.height()
+        model: graph
         gridSize: 1
         defaultLink: new joint.shapes.html.Link
         linkPinning: false
-    })
-    cells = notebook.get("cells")
-    links = notebook.get("links")
-
-
+    })###
 
 
 init_graph = (json_graph) ->

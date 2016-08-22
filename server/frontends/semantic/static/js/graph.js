@@ -4,7 +4,9 @@ var MetaGraph, imports,
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
-imports = require('./ui');
+imports = {
+  ui: require('./ui')
+};
 
 MetaGraph = (function(superClass) {
   extend(MetaGraph, superClass);
@@ -65,7 +67,7 @@ MetaGraph = (function(superClass) {
       });
       return links_list.push(link);
     });
-    return graph.addCells(slice.call(elems_list).concat(slice.call(links_list)));
+    return this.addCells(slice.call(elems_list).concat(slice.call(links_list)));
   };
 
   MetaGraph.prototype.custom_events = {
