@@ -2,7 +2,7 @@
 var init_graph;
 
 $(document).ready(function() {
-  var global_gui, imports, message, notebook, session, uivent;
+  var a, global_gui, imports, message, notebook, session, uivent;
   joint.shapes.html = {};
   _.extend(joint.shapes.html, require('./node'), require('./nodeview'));
   imports = {
@@ -15,6 +15,8 @@ $(document).ready(function() {
     paper: require("./paper")
   };
   _.extend(imports, require("./objects"));
+  a = JSON.stringify(imports.models.MetabookModel);
+  console.log(a);
   message = new imports.messages.SessionDisconnectedMessage({
     el: imports.settings.id.globalmessages
   });

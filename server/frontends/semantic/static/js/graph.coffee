@@ -23,6 +23,11 @@ class MetaGraph extends joint.dia.Graph
         cells = @metabook.get("cells")
         links = @metabook.get("links")
 
+        # TODO: Differentiate between different nodes according to their core SHA1
+        # TODO:
+        # TODO:
+        # TODO:
+
         cells.each( (cell_model) ->
             source = cell_model.get('source')
             id = cell_model.id
